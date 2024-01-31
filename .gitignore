@@ -1,0 +1,6 @@
+.idea/
+.space/
+.venv/
+venv/
+node_modules/
+.env
