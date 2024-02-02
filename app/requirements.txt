@@ -1,4 +1,0 @@
-deta~=1.1.0
-fastapi~=0.92.0
-pydantic
-git+https://github.com/jnsougata/discohook@8bcf0c91c5396dc05561fba9539d0047154697e2
