@@ -6,6 +6,8 @@ import contextlib
 
 from starlette.requests import Request
 from starlette.responses import JSONResponse
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 import discohook
 
@@ -25,6 +27,12 @@ async def lifespan(app):
         yield
         print("End lifespan")
 
+class CustomHeaderMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        await self.app.http.session.close()
+        self.app.http.session = aiohttp.ClientSession('https://discord.com', loop = asyncio.get_event_loop())
+        return await call_next(request)
+
 app = discohook.Client(
     application_id=APPLICATION_ID,
     token=APPLICATION_TOKEN,
@@ -32,6 +40,7 @@ app = discohook.Client(
     password=APPLICATION_PASSWORD,
     default_help_command=True,
     lifespan=lifespan,
+    middleware=[Middleware(CustomHeaderMiddleware)],
 )
 
 # Set before invoke (if lifespan didn't work on serverless instance)
