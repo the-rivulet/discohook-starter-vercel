@@ -19,9 +19,11 @@ LOG_CHANNEL_ID = os.getenv("DISCORD_LOG_CHANNEL_ID")
 @contextlib.asynccontextmanager
 async def lifespan(app):
     # workaround for vercel deployments
-    loop = asyncio.get_event_loop()
-    await app.http.session.close()
-    app.http.session = aiohttp.ClientSession('https://discord.com', loop = loop)
+    async with aiohttp.ClientSession('https://discord.com', loop = asyncio.get_running_loop()) as session:
+        await app.http.session.close()
+        app.http.session = session
+        yield
+        print("End lifespan")
 
 app = discohook.Client(
     application_id=APPLICATION_ID,
