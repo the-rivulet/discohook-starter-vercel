@@ -3,11 +3,15 @@ import os
 import logging
 
 import uvicorn
+
+import aiohttp
+import asyncio
+import contextlib
+
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 import discohook
-
 
 APPLICATION_ID = os.getenv("DISCORD_APP_ID")
 APPLICATION_TOKEN = os.getenv("DISCORD_APP_TOKEN")
@@ -16,12 +20,20 @@ APPLICATION_PASSWORD = os.getenv("DISCORD_APP_PASSWORD")
 
 LOG_CHANNEL_ID = os.getenv("DISCORD_LOG_CHANNEL_ID")
 
+@contextlib.asynccontextmanager
+async def lifespan(app):
+    # workaround for vercel deployments
+    async with aiohttp.ClientSession('https://discord.com', loop = asyncio.get_running_loop()) as session:
+        await app.http.session.close()
+        app.http.session = session
+
 app = discohook.Client(
     application_id=APPLICATION_ID,
     token=APPLICATION_TOKEN,
     public_key=APPLICATION_PUBLIC_KEY,
     password=APPLICATION_PASSWORD,
     default_help_command=True,
+    lifespan=lifespan,
 )
 
 SUCCESS = 'success'
