@@ -39,17 +39,17 @@ app = discohook.Client(
     public_key=APPLICATION_PUBLIC_KEY,
     password=APPLICATION_PASSWORD,
     default_help_command=True,
-    lifespan=lifespan,
+#    lifespan=lifespan,
     middleware=[Middleware(CustomHeaderMiddleware)],
 )
 
 # Set before invoke (if lifespan didn't work on serverless instance)
-@app.before_invoke()
-async def before_invoke(interaction): # force new sessions every request is the only way to fix it atm
-    if interaction.kind != discohook.InteractionType.ping:
-        loop = asyncio.get_event_loop()
-        await app.http.session.close()
-        app.http.session = aiohttp.ClientSession('https://discord.com', loop = loop)
+#@app.before_invoke()
+#async def before_invoke(interaction): # force new sessions every request is the only way to fix it atm
+#    if interaction.kind != discohook.InteractionType.ping:
+#        loop = asyncio.get_event_loop()
+#        await app.http.session.close()
+#        app.http.session = aiohttp.ClientSession('https://discord.com', loop = loop)
 
 
 @app.load
