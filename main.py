@@ -40,7 +40,7 @@ app = discohook.Client(
     password=APPLICATION_PASSWORD,
     default_help_command=True,
     lifespan=lifespan,
-    middleware=[Middleware(CustomHeaderMiddleware)],
+#    middleware=[Middleware(CustomHeaderMiddleware)],
 )
 
 # Set before invoke (if lifespan didn't work on serverless instance)
