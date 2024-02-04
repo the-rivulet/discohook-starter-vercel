@@ -1,73 +1,69 @@
 import os
+
+import logging
+
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+
 import discohook
+
 
 APPLICATION_ID = os.getenv("DISCORD_APP_ID")
 APPLICATION_TOKEN = os.getenv("DISCORD_APP_TOKEN")
 APPLICATION_PUBLIC_KEY = os.getenv("DISCORD_APP_PUBLIC_KEY")
 APPLICATION_PASSWORD = os.getenv("DISCORD_APP_PASSWORD")
 
-CHANNEL_ID = os.getenv("DISCORD_CHANNEL_ID")
 LOG_CHANNEL_ID = os.getenv("DISCORD_LOG_CHANNEL_ID")
 
 app = discohook.Client(
     application_id=APPLICATION_ID,
-    public_key=APPLICATION_PUBLIC_KEY,
     token=APPLICATION_TOKEN,
-    password=APPLICATION_PASSWORD,  # Must be provided if you want to use the dashboard.
-    default_help_command=True,  # This will enable your bot to use  default help command (/help).
+    public_key=APPLICATION_PUBLIC_KEY,
+    password=APPLICATION_PASSWORD,
+    default_help_command=True,
 )
 
+SUCCESS = 'success'
 
-# Adding a error handler for all interactions
-@app.on_interaction_error()
-async def handler(i: discohook.Interaction, err: Exception):
-    user_response = "Some error occurred! Please contact the developer."
-    if i.responded:
-        await i.response.followup(user_response, ephemeral=True)
-    else:
-        await i.response.send(user_response, ephemeral=True)
+if LOG_CHANNEL_ID:
 
-    await app.send("12345678910", f"Error: {err}")  # send error to a channel in development server
+    import asyncio
 
+    class DiscordLog:
+        def __init__(self, client, channel_id):
+            self._client = client
+            self._channel_id = channel_id
 
-# Adding a error handler for any serverside exception
-@app.on_error()
-async def handler(_request, err: Exception):
-    # request: starlette.requests.Request
-    # err is the error object
-    await app.send("12345678910", f"Error: {err}")  # send error to a channel in development server
-    # If you don't have reference to `app` object, you can use `request.app` to get the app object.
+        def _log(self, msg):
+            # loop = self._client.http.session.loop
+            asyncio.create_task(self._client.send(self._channel_id, msg))
 
+        def warning(self, msg):
+            self._log(msg)
 
-# Note: ApplicationCommand is a decorator factory.
-# It will return a decorator which will register the function as a command.
-# The decorator for different command types are different and take a different set of arguments.
-# If name is not provided, it will use the callback function name as the command name
-# If command description is not provided for slash command and function's docstring is not found, it will raise ValueError.
+        def info(self, msg):
+            self._log(msg)
+
+    LOG = DiscordLog(app, LOG_CHANNEL_ID)
+
+else:
+    LOG = logging.getLogger(__name__)
 
 
-# Making slash command
 @app.load
-@discohook.command.slash()
-async def ping(i: discohook.Interaction):
-    """Ping the bot."""
-    await i.response.send("Pong!")
+@discohook.command.slash(
+    name="hello",
+    description="Say Hello"
+)
+async def beep_command(interaction: discohook.Interaction):
+    username = interaction.author.global_name
+    await interaction.response.send(
+        f"Hello, {username}!"
+    )
 
 
-# Making user command
-@app.load
-@discohook.command.user()
-async def avatar(i: discohook.Interaction, user: discohook.User):
-    embed = discohook.Embed()
-    embed.set_image(img=user.avatar.url)
-    await i.response.send(embed=embed)
+async def index(request: Request):
 
+    return JSONResponse({"success": True}, status_code=200)
 
-# Making message command
-@app.load
-@discohook.command.message()
-async def quote(i: discohook.Interaction, message: discohook.Message):
-    embed = discohook.Embed()
-    embed.set_author(name=message.author.name, icon_url=message.author.avatar.url)
-    embed.description = message.content
-    await i.response.send(embed=embed)
+app.add_route("/", index, methods=["GET"], include_in_schema=False)
