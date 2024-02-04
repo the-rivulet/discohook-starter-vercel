@@ -29,8 +29,8 @@ async def lifespan(app):
 
 class CustomHeaderMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        await self.app.http.session.close()
-        self.app.http.session = aiohttp.ClientSession('https://discord.com', loop = asyncio.get_event_loop())
+        await request.app.http.session.close()
+        request.app.http.session = aiohttp.ClientSession('https://discord.com', loop = asyncio.get_event_loop())
         return await call_next(request)
 
 app = discohook.Client(
@@ -40,7 +40,7 @@ app = discohook.Client(
     password=APPLICATION_PASSWORD,
     default_help_command=True,
     lifespan=lifespan,
-#    middleware=[Middleware(CustomHeaderMiddleware)],
+    middleware=[Middleware(CustomHeaderMiddleware)],
 )
 
 # Set before invoke (if lifespan didn't work on serverless instance)
