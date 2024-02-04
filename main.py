@@ -29,7 +29,7 @@ app = discohook.Client(
     public_key=APPLICATION_PUBLIC_KEY,
     password=APPLICATION_PASSWORD,
     default_help_command=True,
-    lifespan=lifespan,
+ #   lifespan=lifespan,
 )
 
 # Set before invoke (if lifespan didn't work on serverless instance)
