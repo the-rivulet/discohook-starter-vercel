@@ -1,9 +1,5 @@
 import os
 
-import logging
-
-import uvicorn
-
 import aiohttp
 import asyncio
 import contextlib
@@ -36,33 +32,6 @@ app = discohook.Client(
     lifespan=lifespan,
 )
 
-SUCCESS = 'success'
-
-if LOG_CHANNEL_ID:
-
-    import asyncio
-
-    class DiscordLog:
-        def __init__(self, client, channel_id):
-            self._client = client
-            self._channel_id = channel_id
-
-        def _log(self, msg):
-            # loop = self._client.http.session.loop
-            asyncio.create_task(self._client.send(self._channel_id, msg))
-
-        def warning(self, msg):
-            self._log(msg)
-
-        def info(self, msg):
-            self._log(msg)
-
-    LOG = DiscordLog(app, LOG_CHANNEL_ID)
-
-else:
-    LOG = logging.getLogger(__name__)
-
-
 @app.load
 @discohook.command.slash(
     name="hello",
@@ -76,11 +45,6 @@ async def beep_command(interaction: discohook.Interaction):
 
 
 async def index(request: Request):
-
     return JSONResponse({"success": True}, status_code=200)
 
 app.add_route("/", index, methods=["GET"], include_in_schema=False)
-
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
