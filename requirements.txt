@@ -1,1 +1,2 @@
+uvicorn
 git+https://github.com/jnsougata/discohook@afcacdce3e0423c1e9120bab03b71e9a9ac561dd
