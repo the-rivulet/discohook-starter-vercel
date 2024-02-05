@@ -2,7 +2,6 @@ import os
 
 import aiohttp
 import asyncio
-import contextlib
 
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -16,16 +15,6 @@ APPLICATION_TOKEN = os.getenv("DISCORD_APP_TOKEN")
 APPLICATION_PUBLIC_KEY = os.getenv("DISCORD_APP_PUBLIC_KEY")
 APPLICATION_PASSWORD = os.getenv("DISCORD_APP_PASSWORD")
 
-LOG_CHANNEL_ID = os.getenv("DISCORD_LOG_CHANNEL_ID")
-
-@contextlib.asynccontextmanager
-async def lifespan(app):
-    # workaround for vercel deployments
-    async with aiohttp.ClientSession('https://discord.com', loop = asyncio.get_running_loop()) as session:
-        await app.http.session.close()
-        app.http.session = session
-        yield
-        print("End lifespan")
 
 class CustomHeaderMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
@@ -39,7 +28,6 @@ app = discohook.Client(
     public_key=APPLICATION_PUBLIC_KEY,
     password=APPLICATION_PASSWORD,
     default_help_command=True,
-#    lifespan=lifespan,
     middleware=[Middleware(CustomHeaderMiddleware)],
 )
 
