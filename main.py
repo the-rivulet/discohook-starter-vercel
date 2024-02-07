@@ -52,7 +52,7 @@ async def test_command(interaction: discohook.Interaction):
     username = interaction.author.global_name
     await interaction.response.defer()
     await asyncio.sleep(8)
-    interaction.response.followup(str(id(asyncio.get_running_loopp())))
+    interaction.response.followup(str(id(asyncio.get_running_loop())))
 
 async def index(request: Request):
     return JSONResponse({"success": True}, status_code=200)
