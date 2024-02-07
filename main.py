@@ -30,14 +30,6 @@ app = discohook.Client(
     middleware=[Middleware(CustomHeaderMiddleware)],
 )
 
-# Set before invoke (if lifespan didn't work on serverless instance)
-#@app.before_invoke()
-#async def before_invoke(interaction): # force new sessions every request is the only way to fix it atm
-#    if interaction.kind != discohook.InteractionType.ping:
-#        loop = asyncio.get_event_loop()
-#        await app.http.session.close()
-#        app.http.session = aiohttp.ClientSession('https://discord.com', loop = loop)
-
 
 @app.load
 @discohook.command.slash(
@@ -50,6 +42,16 @@ async def beep_command(interaction: discohook.Interaction):
         f"Hello, {username}!"
     )
 
+@app.load
+@discohook.command.slash(
+    name="test",
+    description="test command"
+)
+async def test_command(interaction: discohook.Interaction):
+    username = interaction.author.global_name
+    await interaction.response.defer()
+    await asyncio.sleep(8)
+    interaction.response.followup(str(id(asyncio.get_running_loop()))
 
 async def index(request: Request):
     return JSONResponse({"success": True}, status_code=200)
