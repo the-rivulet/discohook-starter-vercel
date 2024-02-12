@@ -6,9 +6,9 @@ import asyncio
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.middleware import Middleware
-from starlette.middleware.base import BaseHTTPMiddleware
 
 import discohook
+from discohook.middleware import SingleUseSessionMiddleware
 
 APPLICATION_ID = os.getenv("DISCORD_APP_ID")
 APPLICATION_TOKEN = os.getenv("DISCORD_APP_TOKEN")
@@ -16,19 +16,13 @@ APPLICATION_PUBLIC_KEY = os.getenv("DISCORD_APP_PUBLIC_KEY")
 APPLICATION_PASSWORD = os.getenv("DISCORD_APP_PASSWORD")
 
 
-class CustomHeaderMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        await request.app.http.session.close()
-        request.app.http.session = aiohttp.ClientSession('https://discord.com')
-        return await call_next(request)
-
 app = discohook.Client(
     application_id=APPLICATION_ID,
     token=APPLICATION_TOKEN,
     public_key=APPLICATION_PUBLIC_KEY,
     password=APPLICATION_PASSWORD,
     default_help_command=True,
-    middleware=[Middleware(CustomHeaderMiddleware)],
+    middleware=[Middleware(SingleUseSessionMiddleware)],
 )
 
 
