@@ -1,1 +1,2 @@
 git+https://github.com/VotorDev/discohook.git@vercel_middleware
+redis

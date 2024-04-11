@@ -10,6 +10,8 @@ from starlette.middleware import Middleware
 import discohook
 from discohook.middleware import SingleUseSessionMiddleware
 
+from storage import Storage
+
 APPLICATION_ID = os.getenv("DISCORD_APP_ID")
 APPLICATION_TOKEN = os.getenv("DISCORD_APP_TOKEN")
 APPLICATION_PUBLIC_KEY = os.getenv("DISCORD_APP_PUBLIC_KEY")
@@ -47,6 +49,35 @@ async def test_command(interaction: discohook.Interaction):
     await interaction.response.defer()
     await asyncio.sleep(8)
     await interaction.response.followup(str(id(asyncio.get_running_loop())))
+
+@app.load
+@discohook.command.slash(
+    name="test-set",
+    description="test set command",
+    options=[
+            discohook.Option.string(
+                name="value",
+                required=True,
+                description="Value to set",
+            ),
+        ]
+    )
+async def test_set_command(interaction: discohook.Interaction, value:str):
+    username = interaction.author.global_name
+    DB = Storage.client("testDB")
+    DB.set(value, key=interaction.author.id)
+    await interaction.response.send(f"{username} has set value={value}")
+
+@app.load
+@discohook.command.slash(
+    name="test-get",
+    description="test get command"
+    )
+async def test_set_command(interaction: discohook.Interaction):
+    username = interaction.author.global_name
+    DB = Storage.client("testDB")
+    value = DB.get(key=interaction.author.id)
+    await interaction.response.send(f"{username} has retrieved value={value}")
 
 async def index(request: Request):
     return JSONResponse({"success": True}, status_code=200)
