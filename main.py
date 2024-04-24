@@ -28,17 +28,25 @@ async def hello_command(interaction: discohook.Interaction):
     await interaction.response.send(content=f"Hello, {username}!")
 
 items = {}
-def register_item(name: str, description: str):
-    items[name.lower()] = {"name": name, "description": description}
+def register_item(name: str, description: str, fields: dict):
+    item = {"name": name, "description": description, "fields": fields}
+    items[name.lower()] = item
 
-register_item("Lantern", "Light it up!!")
+register_item("Batnip", "Batflies are drawn towards the batnip.", {"size": "Small"})
 
 @app.load
-@discohook.command.slash(name="item", description="Get information about an item", options=[discohook.Option.string(name="item", required=True, description="Item name")])
+@discohook.command.slash(
+    name="item",
+    description="Get information about an item",
+    options=[discohook.Option.string(name="item", required=True, description="Item name")]
+)
 async def item_command(interaction: discohook.Interaction, item: str):
     i = items[item.lower()]
     if i:
-        await interaction.response.send(embed=discohook.Embed(title=i["name"], description=i["description"]))
+        e = discohook.Embed(title=i["name"], description=i["description"])
+        for x in i["fields"]:
+            e.add_field(name=x, value=i["fields"][x], inline=True)
+        await interaction.response.send(embed=e)
     else:
         await interaction.response.send(content="I couldn't find that item.")
     
