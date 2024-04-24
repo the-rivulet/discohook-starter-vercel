@@ -31,16 +31,16 @@ items = {}
 def register_item(name: str, kind: str, size: str, description: str, fields: dict = {}):
     item = {"name": name, "kind": kind, "description": description, "size": size, "fields": fields}
     items[name.lower()] = item
-def register_food(name: str, size: str, pips: int|str, ftype: str, description: str, fields: dict = {}):
+def register_food(name: str, size: str, pips: str, ftype: str, description: str, fields: dict = {}):
     register_item(name, f"Food ({ftype})", size, description, {"Food Pips": str(pips)} + fields)
 
 # Food
-register_food("Blue Fruit", "Small", 1, "Plant", "A slugcat's staple food.")
-register_food("Bubble Fruit", "Small", 1, "Plant", "Inedible until immersed in water.")
-register_food("Dandelion Peach", "Small", 1, "Plant", "Found in the Sky Islands.")
-register_food("Glow Weed", "Small", 1, "Plant", "Has a 3 distance glow while in water.")
-register_food("Gooieduck", "Small", 2, "Plant", "Requires 2 actions to eat.\nWhile held, touched worm grass is stunned.")
-register_food("Lilypuck", "Small", 1, "Plant", "Sharp!", {"Impact": "On first throw, 2d4 + Power damage."})
+register_food("Blue Fruit", "Small", "1", "Plant", "A slugcat's staple food.")
+register_food("Bubble Fruit", "Small", "1", "Plant", "Inedible until immersed in water.")
+register_food("Dandelion Peach", "Small", "1", "Plant", "Found in the Sky Islands.")
+register_food("Glow Weed", "Small", "1", "Plant", "Has a 3 distance glow while in water.")
+register_food("Gooieduck", "Small", "2", "Plant", "Requires 2 actions to eat.\nWhile held, touched worm grass is stunned.")
+register_food("Lilypuck", "Small", "1", "Plant", "Sharp!", {"Impact": "On first throw, 2d4 + Power damage."})
 register_food("Slime Mold", "Small", "1-2", "Plant", "Has a 1 distance glow.")
 # Other Items
 register_item("Batnip", "Other", "Small", "Batflies are drawn towards the batnip.", {"Value": "2"})
