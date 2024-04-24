@@ -90,7 +90,7 @@ register_item(
 async def item_command(interaction: discohook.Interaction, item: str):
     n = None
     prevMatches = []
-    for x in range(len(item-1), 0, -1):
+    for x in range(len(item)-1, 0, -1):
         part = item[0:x]
         matches = filter(lambda m: m[0:x] == part, items.keys())
         if len(matches) == 0:
