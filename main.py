@@ -1,22 +1,16 @@
 import os
-
 import aiohttp
 import asyncio
-
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.middleware import Middleware
-
 import discohook
 from discohook.middleware import SingleUseSessionMiddleware
-
-from storage import Storage
 
 APPLICATION_ID = os.getenv("DISCORD_APP_ID")
 APPLICATION_TOKEN = os.getenv("DISCORD_APP_TOKEN")
 APPLICATION_PUBLIC_KEY = os.getenv("DISCORD_APP_PUBLIC_KEY")
 APPLICATION_PASSWORD = os.getenv("DISCORD_APP_PASSWORD")
-
 
 app = discohook.Client(
     application_id=APPLICATION_ID,
@@ -27,29 +21,29 @@ app = discohook.Client(
     middleware=[Middleware(SingleUseSessionMiddleware)],
 )
 
+@app.load
+@discohook.command.slash(name="hello", description="Say hello")
+async def hello_command(interaction: discohook.Interaction):
+    username = interaction.author.global_name
+    await interaction.response.send(content=f"Hello, {username}!")
+
+items = {}
+def register_item(name: str, description: str):
+    items[name.lower()] = {"name": name, "description": description}
+
+register_item("Lantern", "Light it up!!")
 
 @app.load
-@discohook.command.slash(
-    name="hello",
-    description="Say Hello"
-)
-async def beep_command(interaction: discohook.Interaction):
-    username = interaction.author.global_name
-    await interaction.response.send(
-        f"Hello, {username}!"
-    )
+@discohook.command.slash(name="item", description="Get information about an item", options=[discohook.Option.string(name="item", required=True, description="Item name")])
+async def item_command(interaction: discohook.Interaction, item: str):
+    i = items[item.lower()]
+    if i:
+        await interaction.response.send(embed=discohook.Embed(title=i["name"], description=i["description"]))
+    else:
+        await interaction.response.send(content="I couldn't find that item.")
+    
 
-@app.load
-@discohook.command.slash(
-    name="test",
-    description="test command"
-)
-async def test_command(interaction: discohook.Interaction):
-    username = interaction.author.global_name
-    await interaction.response.defer()
-    await asyncio.sleep(8)
-    await interaction.response.followup(str(id(asyncio.get_running_loop())))
-
+"""
 @app.load
 @discohook.command.slash(
     name="test-set",
@@ -62,22 +56,7 @@ async def test_command(interaction: discohook.Interaction):
             ),
         ]
     )
-async def test_set_command(interaction: discohook.Interaction, value:str):
-    username = interaction.author.global_name
-    DB = Storage.client("testDB")
-    DB.set(value, key=interaction.author.id)
-    await interaction.response.send(f"{username} has set value={value}")
-
-@app.load
-@discohook.command.slash(
-    name="test-get",
-    description="test get command"
-    )
-async def test_set_command(interaction: discohook.Interaction):
-    username = interaction.author.global_name
-    DB = Storage.client("testDB")
-    value = DB.get(key=interaction.author.id)
-    await interaction.response.send(f"{username} has retrieved value={value}")
+"""
 
 async def index(request: Request):
     return JSONResponse({"success": True}, status_code=200)
