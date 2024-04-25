@@ -631,6 +631,39 @@ register_feature(
     {"Required Food": "-1", "Reserve Food": "-1"})
 register_feature("Survival Instincts", "Other Adaptation", "|⊚⊚| Reroll any failures on your current skill check, once.")
 # Burdens
+register_feature(
+    "Blinded", "Burden",
+    "You are unable to see and will automatically fail any Perception checks that involve sight.\n\
+    You are immune to the effects of darkness and bright lights.",
+    {"Required Food": "-1"})
+register_feature("Declawed", "Burden", "Lose a hand item slot.", {"Required Food": "-1"})
+register_feature(
+    "Exhausting Throw", "Burden",
+    "All of your thrown objects gain an additional damage die. After throwing an object, you gain the exhausted condition until you spend two actions to remove it.\n\
+    Neither of these effects apply if you have the exhausted condition.")
+register_feature(
+    "Frail", "Burden",
+    "You are unable to throw spears, except Flaming and Ice Spears. Your maximum HP is reduced by 4, and when hit by a stun, you are stunned for double the duration.",
+    {"Karmic Balance": "+2"})
+register_feature(
+    "Innate Wrath", "Burden",
+    "Your maximum karma is lowered to 1, but is always reinforced upon hibernation.\n\
+    You have +2D when trying to hit a creature.\n\
+    When holding a sapient creature's corpse, their Karma is added to yours.",
+    {"Karmic Balance": "-2"})
+register_feature(
+    "Landlubber", "Burden",
+    "Your speed is increased by 2, and your jump height is increased by 1.\n\
+    Speed is decreased by 4 while in water. Your breath capacity is reduced by 2 rounds, and you get -1D to all checks while in water.")
+register_feature("Light Sensitivity", "Burden", "The usual penalties for dim lighting conditions do not apply.\nAny flashes of light which blind you will also stun you for one round.")
+register_feature("Master of None", "Burden", "You may increase one skill by 2 points, or two skills by 1 point.\nYou cannot raise any skill above 2 while creating your character. Passages are unaffected.")
+register_feature(
+    "Overwhelming Haze", "Burden",
+    "You may increase one skill by 1 point.\nRoll 1d4 at the start of each cycle. Up to that many times, the GM may ask for a DC 3 will check.\n\
+    * Success: A slight red haze encompasses your vision, dropping your perception by 1 for one round.\n\
+    * Partial Success: Red haze creeps in, lowering perception to 0 and dropping your speed to half its usual value, rounded down. This lasts for one round.\n\
+    * Failure: The hallucination is overwhelming, and you are stunned for the round.")
+register_feature("Pacifist", "Burden", "You are unable to purposely harm creatures.", {"Karmic Balance": "+2"})
 # Rites
 
 @app.load
