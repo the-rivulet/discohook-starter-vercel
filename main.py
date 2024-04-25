@@ -465,7 +465,7 @@ async def rule_command(interaction: discohook.Interaction, rule: str):
     match = look_for(rules, rule)
     if match is not None:
         i = rules[match]
-        e = discohook.Embed(rule[0].upper() + rule[1:].lower(), description=i)
+        e = discohook.Embed(match[0].upper() + match[1:], description=i)
         await interaction.response.send(embed=e)
     else:
         await interaction.response.send(content="I couldn't find that condition.")
