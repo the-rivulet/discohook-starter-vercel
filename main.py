@@ -32,8 +32,7 @@ def register_item(name: str, kind: str, size: str, description: str, fields: dic
     item = {"name": name, "kind": kind, "description": description, "size": size, "fields": fields}
     items[name.lower()] = item
 def register_food(name: str, size: str, pips: str, ftype: str, description: str, fields: dict = {}):
-    fields["Food Pips"] = pips
-    register_item(name, f"Food ({ftype})", size, description, fields)
+    register_item(name, f"Food ({ftype})", size, description, {**fields, "Food Pips": pips})
 
 # Food
 register_food("Blue Fruit", "Small", "1", "Plant", "The pupae of a bug which resembles a plant. They dangle from ceilings on black vines.")
