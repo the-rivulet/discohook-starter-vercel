@@ -545,6 +545,93 @@ register_feature(
 register_feature("Wings", "Movement Adaptation", "|⊚⊚| You are flying for this round. This doesn't work while the wings are wet.", {"Required Food": "+1"})
 register_feature("Spirit Syphon", "Karmic Balance Adaptation", "When you kill a creature that is size 2 or larger, you gain 1 Blessing.", {"Required Food": "+1"})
 register_feature("The Wheel", "Karmic Balance Adaptation", "You gain +3 Max Blessings that cannot be reduced by negative Karmic Balance. Additionally, choose 1 Rite to gain.")
+register_feature(
+    "Childbearer", "Ally Adaptation",
+    "Create a new character sheet, with two less passages than you (can go into the negatives).\n\
+    * Take the first adaptation from each parent. Ignore ally adaptations, and duplicate adaptations.\n\
+    * Take the first burden that makes sense, from the first parent.\n\
+    * Add a copy of Small Build to the child. If they get old enough, this copy can be removed.\n\
+    * Finally, assign their remaining skill points as normal.\n\
+    If the child is lost, all checks receive -1D unless the check is related to them.")
+register_feature(
+    "Lizard Friend", "Ally Adaptation",
+    "You now have a tamed lizard of your choice. You may choose their age, although it might be restricted depending on your choice:\n\
+    * Blue lizards can be hatchings, young, or adult.\n\
+    * Most lizards must be hatchlings or young.\n\
+    * Red, caramel, and train lizards must be hatchlings.")
+register_feature(
+    "Neuron Cluster", "Ally Adaptation",
+    "Your comprehension represents neuron flies. You can spend 1 comprehension to fully block an attack aimed at you, or to add a neuron fly to your inventory.\
+    You cannot if it's at  -1, as you'd lose your last neuron fly.\n\
+    |▶| Add a held neuron fly to your neuron cluster. Remove the item, and gain 1 comprehension. This cannot bring comprehension above 6.")
+register_feature("Operator", "Ally Adaptation", "You have an overseer which you can send commands to by spending an action. If the overseer is destroyed, it cannot be used until a new one shows up at the start of the next cycle.")
+register_feature(
+    "Anesthetic Barbs", "Support Adaptation",
+    "|⊚| Your next unarmed strike, if it hits, will remove an action from the target. They must also pass an endurance check or fall asleep. The DC for the check depends on their size compared to yours:\n\
+    * Smaller than you: DC 3.\n\
+    * The same size as you: DC 2.\n\
+    * Larger than you: DC 1.")
+register_feature("Imitator", "Support Adaptation", "|▶| Imitate the sound of a known creature, and/or make your voice seem like it is coming from a different place than it is.")
+register_feature("Luminescent", "Support Adaptation", "You provide light within 5 distance of yourself.")
+register_feature("Signal Antennae", "Support Adaptation", "|▶| Send a telepathic message to another creature within the same region as you.")
+register_feature(
+    "Tracker", "Support Adaptation",
+    "|▶, ⊚| Mark a creature which you can sense.\
+    For 3 rounds, or until another creature is marked, you and your allies roll an extra 1D to hit the creature, and deal extra damage upon a successful hit, equal to your perception + 1.",
+    {"Required Food": "+1"})
+register_feature("Trophallaxis", "Support Adaptation", "|⊚| Grant an adjacent creature one food pip.", {"Karmic Balance": "+1"})
+register_feature(
+    "Water Secretions", "Support Adaptation",
+    "|▶| Pop a touched bubble fruit.\n\
+    |▶| Fire a blast of water at a creature. Treat as a thrown projectile with this impact effect: The target is pushed away by 1d4 distance and is drenched.")
+register_feature(
+    "Calcified Spears", "Item Adaptatation",
+    "|▶▶| A needle grows from your tail, which is added to an empty hand or back slot and functions as a spear. No more than 3 of your needles may exist at a time.\n\
+    If you have the Astomatous Adaptation, you are able to eat through this needle. When hitting an edible item, it is consumed. If it is a living creature you can eat, it gives 1 food pip on hit.\n\
+    Unlike other spears, calcified spears cannot conduct electricity.")
+register_feature(
+    "Crafty Nature", "Item Adaptation",
+    "|▶▶, ⊚| Roll 2d6 on the table below and spit out an item into a free hand or onto the ground. This only functions when your mouth slot is empty.\n\
+    2 - Bomb, 3 - Spore Puff, 4 - Lantern, 5 - Firebush, 6 - Bubble Fruit, 7 - Batnip, 8 - Mushroom, 9 - Bubble Weed, 10 - Vulture Grub, 11 - Beehive, 12 - Pearl\n\
+    Gain +1D when crafting.", {"Required Food": "+2"})
+register_feature("Combustible Bile", "Item Adaptation", "|▶▶, ⊚| Turn a rock into a bomb or a spear into an explosive spear.", {"Karmic Balance": "-1"})
+register_feature("Heirloom", "Item Adaptation", "Select an item that you have when this Adaptation is taken or when hibernating. You have +1D with any checks made using or involving this item. If Item Recall is used on this item, it costs only one Blessing.", {"Karmic Balance": "+1"})
+register_feature(
+    "Lorekeeper", "Item Adaptation",
+    "|▶▶| Change the text or function of an unencrypted pearl.\n\
+    |▶▶| Encrypt a pearl so that in order to access the contents the decryption key must be used, or a check with a DC equal to your Comprehension must be passed.\n\
+    You gain pearl affinity if you don't have it already.")
+register_feature("Sheath Pouch", "Item Adaptation", "Gain an extra inventory slot for the storage of spears. Multiple spears may be stored here, however there can only be one of each type.")
+register_feature("Stretchy Cheeks", "Item Adaptation", "|▶| Spit an item stored within a mouth slot out. Treat it as if you threw the item.\nYou can store 2 additional items in your mouth.", {"Required Food": "+1"})
+register_feature("Strong Back", "Item Adaptation", "You gain two additional item slots on your back.", {"Required Food": "+1", "Reserve Food": "+1"})
+register_feature("Tendril Swarm", "Item Adaptation", "You gain two additional hand item slots.\nYou can walk along any surface and pick up any item that's within 3 distance of you.\nYour jump height is reduced by 4.", {"Required Food": "+1"})
+register_feature("Astomatous", "Other Adaptation", "You do not have a mouth, so are unable to eat items or store items within it.", {"Reserve Food": "+2"})
+register_feature(
+    "Conversion", "Other Adaptation",
+    "Select one resource conversion from the list below. You will be able to use this at any time. Conversions can only be done 10 times per cycle.\n\
+    * ⊚ → 1 HP\n* ⊚⊚ → ⦻\n* ⦻ → 1 HP\n* ⦻⦻ → Substitute for 1 food pip in an ability.\n* 2 HP → Substitute for 1 food pip in an ability.\n* 3 HP → ⦻",
+    {"Karmic Balance": "+1"})
+register_feature(
+    "Cystic Core", "Other Adaptation",
+    "Your unarmed attack now pins creatures to the rot cysts on your body. If you kill a creature using an unarmed attack, you destroy the corpse and gain every food pip its corpse had.\n\
+    Incoming damage from explosions is doubled.",
+    {"Required Food": "+2"})
+register_feature("Fat Stores", "Other Adaptation", "When falling on a creature, you deal damage equal to 1d6 + your size. This is in addition to any fall damage you transfer to them.\nYour speed is reduced by 1.", {"Reserve Food": "+1"})
+register_feature("Gigantism", "Other Adaptation", "Your move speed and size are both increased by 1. Your corpse is worth 2 more food pips.", {"Required Food": "+1"})
+register_feature("Minimalist", "Other Adaptation", "+1D when trying to ignore the effects of exhaustion.", {"Required Food": "-1"})
+register_feature(
+    "Sensitive Ears", "Other Adaptation",
+    "Unless you are wearing ear protection, these effects apply:\n\
+    Your ears can pick up the most minute of sounds and have +1D when making Perception checks using your ears.\n\
+    In loud conditions, you have -1D when making any checks and the Perception bonus does not apply.")
+register_feature(
+    "Small Build", "Other Adaptation",
+    "You deal 2 less damage with all physical attacks, to a minimum of 1.\n\
+    Your size is decreased by 1. Your corpse is worth 1 less food pip.",
+    {"Required Food": "-1", "Reserve Food": "-1"})
+register_feature("Survival Instincts", "Other Adaptation", "|⊚⊚| Reroll any failures on your current skill check, once.")
+# Burdens
+# Rites
 
 @app.load
 @discohook.command.slash(
