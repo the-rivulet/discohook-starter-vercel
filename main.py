@@ -22,13 +22,21 @@ app = discohook.Client(
 )
 
 def look_for(l: dict, target: str):
-    matches = list(filter(lambda other: target.lower() in other, l.keys()))
-    while len(matches) == 0 and len(target) > 0:
-        target = target[:-1]
-        matches = list(filter(lambda other: target.lower() in other, l.keys()))
-    if len(matches) > 0:
-        return sorted(matches, key=len)[0]
-    return None
+    # look for the closest match
+    best_match = None
+    best_share = 0
+    for item in l:
+        shared = 0
+        # find how many characters it shares
+        for i in range(len(item)):
+            x = 1
+            while item[i : (i + x)] in target:
+                shared = max(shared, x)
+                x += 1
+        if shared > best_share:
+            best_share = shared
+            best_match = item
+    return best_match
 
 @app.load
 @discohook.command.slash(name="hello", description="Say hello")
