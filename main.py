@@ -32,8 +32,7 @@ def register_item(name: str, kind: str, size: str, description: str, fields: dic
     item = {"name": name, "kind": kind, "description": description, "size": size, "fields": fields}
     items[name.lower()] = item
 def register_food(name: str, size: str, pips: str, ftype: str, description: str, fields: dict = {}):
-    if len(pips) > 0:
-        fields["Food Pips"] = pips
+    fields["Food Pips"] = pips
     register_item(name, f"Food ({ftype})", size, description, fields)
 
 # Food
@@ -55,8 +54,8 @@ register_food(
      dealing 6d6 damage at the point of impact, and half of that to all creatures within 6 distance of the impact point."})
 register_food("Neuron Fly", "Small", "1", "Any", "Gain the luminescent adaptation if you don't have it.")
 register_food("Seed", "Small", "1", "Any", "The popped kernels of popcorn plants. While hard to access, they're palatable to anyone.")
-register_food("Mushroom", "Small", "", "Any", "Gain the haste condition for 4 rounds. The duration can stack.", {"Trade Value": "2"})
-register_food("Karma Flower", "Small", "", "Any", "Gain the reinforcement condition.", {"Trade Value": "5"})
+register_item("Mushroom", "Food (Any)", "Small", "Gain the haste condition for 4 rounds. The duration can stack.", {"Trade Value": "2"})
+register_item("Karma Flower", "Food (Any)" "Small", "Gain the reinforcement condition.", {"Trade Value": "5"})
 register_food("Eggbug Egg", "Small", "1", "Egg", "The eggs of the skittish eggbug, usually dropped in clusters.")
 register_food(
     "Lizard Egg", "Small", "4", "Egg",
@@ -246,25 +245,12 @@ register_item("Water Fins", "Back", "Large", "Movement speed in water is increas
     options=[discohook.Option.string(name="item", required=True, description="Item name")]
 )
 async def item_command(interaction: discohook.Interaction, item: str):
-    n = None
-    prevMatches = []
-    for x in range(len(item.lower())-1, 0, -1):
-        part = item[0:x]
-        if part in items:
-            n = part
-            break
-        matches = list(filter(lambda other: part in other, items.keys()))
-        if len(matches) == 0:
-            if len(prevMatches) > 0:
-                n = prevMatches[0]
-            break
-        elif len(matches) == 1:
-            n = matches[0]
-            break
-        prevMatches = matches
-    if n is None and len(prevMatches) > 0:
-        n = prevMatches[0]
-    if n in items:
+    matches = list(filter(lambda other: item.lower() in other, items.keys()))
+    while len(matches) == 0 and len(item) > 0:
+        item = item[:-1]
+        matches = list(filter(lambda other: item.lower() in other, items.keys()))
+    if len(matches) > 0:
+        n = sorted(matches, key=len)[0]
         i = items[n]
         e = discohook.Embed(title=i["name"], description=i["description"])
         e.add_field(name="Type", value=i["kind"], inline=True)
