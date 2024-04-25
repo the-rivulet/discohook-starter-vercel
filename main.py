@@ -250,10 +250,10 @@ register_item("Water Fins", "Back", "Large", "Movement speed in water is increas
 @discohook.command.slash(
     name="item",
     description="Get information about an item",
-    options=[discohook.Option.string(name="item", required=True, description="Item name")]
+    options=[discohook.Option.string(name="name", required=True, description="Item name")]
 )
-async def item_command(interaction: discohook.Interaction, item: str):
-    match = look_for(items, item)
+async def item_command(interaction: discohook.Interaction, name: str):
+    match = look_for(items, name)
     if match is not None:
         i = items[match]
         e = discohook.Embed(title=i["name"], description=i["description"])
@@ -277,6 +277,9 @@ rules = {
     Players also need to make a character sheet. If the GM wishes to use a map, it is recommended to use a side view map in order to make better use of movement\
     and to more accurately imitate Rain World.\n\
     While these rules are provided to help run the system, the GM is advised to bend these rules in accordance to what they and their players consider would be most fun.",
+    "adaptations": "Adaptations are modifications to your character, allowing for vastly different abilities and playstyles.\
+    You can select them at character creation or complete Passages in order to gain new ones.\n\
+    You cannot have multiple copies of the same adaptation, unless they are two different variants of it.",
     "checks": "Checks are usually an attempt to perform a difficult task, while contests are an attempt to perform a difficult task\
     that is being opposed by another creature, such as making an attack.\nFor checks and contests, you roll a number of D6s equal to\
     2 + your skill. Rolling a 4, 5, or 6 means that that die is a success. For example, if you had 3 Comprehension, you would roll 5D (5 D6s).\
@@ -459,16 +462,107 @@ rules = {
 @discohook.command.slash(
     name="rule",
     description="Get information about a rule",
-    options=[discohook.Option.string(name="rule", required=True, description="Rule name")]
+    options=[discohook.Option.string(name="name", required=True, description="Rule name")]
 )
-async def rule_command(interaction: discohook.Interaction, rule: str):
-    match = look_for(rules, rule)
+async def rule_command(interaction: discohook.Interaction, name: str):
+    match = look_for(rules, name)
     if match is not None:
         i = rules[match]
         e = discohook.Embed(match[0].upper() + match[1:], description=i)
         await interaction.response.send(embed=e)
     else:
-        await interaction.response.send(content="I couldn't find that condition.")
+        await interaction.response.send(content="I couldn't find that rule.")
+
+features = {}
+def register_feature(name: str, kind: str, description: str, fields: dict = {}):
+    feature = {"name": name, "kind": kind, "description": description, "fields": fields}
+    features[name.lower()] = feature
+
+# Adaptations
+register_feature(
+    "Acidic Bile", "Aggressive Adaptation",
+    "|▶, ⊚| Shoot a glob of acid at a target. Treat as a thrown projectile that deals 2d4 damage on impact.",
+    {"Required Food": "+1"})
+register_feature("Aggressive Nature", "Aggressive Adaptation", "Improve your unarmed attack's damage die by one step. (1 → 1d4 → 2d4 → 3d4)", {"Karmic Balance": "-1"})
+register_feature("Powerful", "Aggressive Adaptation", "When making an attack, you may choose to reroll your damage dice once. You must take the new damage roll.")
+register_feature(
+    "Powerful Static", "Aggressive Adaptation",
+    "|▶▶, ⊚| Recharge an item. \n\
+    |▶, ⊚| Shock a creature. Treat as a thrown projectile with this impact effect: 1d6 damage, and stuns the target.\n\
+    |▶▶, ⊚⊚⊚| Attack all creatures within 5 distance of you. On hit, deal 2d6 damage and stun the target.")
+register_feature(
+    "Proboscis", "Aggressive Adaptation",
+    "Select an inventory slot to replace with a Proboscis. If you have Astomatous, it does not replace a slot.\n\
+    Improve your unarmed attack's damage die by one step. (1 → 1d4 → 2d4 → 3d4). In addition, your unarmed attacks provide 1 food pip each time you hit a living creature your diet considers edible.\n\
+    |▶| Drink one food pip out of a piece of food your diet gives you full pips for. This does not work for anything which is dry.",
+    {"Required Food": "+1", "Reserve Food": "-1"})
+register_feature(
+    "Ricospear", "Aggressive Adaptation",
+    "Your projectiles can bounce off up to two surfaces. The path of a previous projectile you used on the same turn is also a valid surface. However, you take -1D to hit if you choose to have it bounce twice.\n\
+    Impact effects do not apply for anything projectiles bounce off.")
+register_feature(
+    "Slowing Spit", "Aggressive Adaptation",
+    "|▶| Spit at a creature. Treat as a thrown projectile with this impact effect: Creature's movement speed is reduced by 2 and they suffer -1D on any Agility checks made during their next turn.",
+    {"Required Food": "+1"})
+register_feature("Spontaneous Combusion", "Aggressive Adaptation", "|⊚| Receive the on fire condition.\nIncoming damage from burning is halved.\nYour unarmed attack sets anything you hit on fire while you are burning.")
+register_feature("Blood Drain", "Protective Adaptation", "When you kill a creature that is size 2 or larger, you gain 2 HP.", {"Required Food": "+1"})
+register_feature(
+    "Chromatophores", "Protective Adaptation",
+    "|▶| Enter camouflage, granting you +2D when making stealth checks. You must spend 1 food pip for every action you make during camouflage. This may be deactivated at any time.",
+    {"Required Food": "+1"})
+register_feature("Evasive Hop", "Protective Adaptation", "You will always dodge the first incoming attack you failed to dodge in each combat encounter.")
+register_feature("Final Stand", "Protective Adaptation", "If you have at least 2 HP when you are damaged, your HP will not drop below 1.")
+register_feature("Hearty", "Protective Adaptation", "Gain +3 max HP. Healing in shelters is increased to 3 HP per food pip.")
+register_feature("Natural Armour", "Protective Adaptation", "Reduces incoming damage from attacks by 2, to a minimum of 1.")
+register_feature(
+    "Parry", "Protective Adaptation",
+    "When an attack is aimed at you, you can choose to try to parry instead of trying to dodge. To do this, you must be holding an item which is able to parry, from this list:\n\
+    * Any type of spear.\n\
+    * Any dagger.\n\
+    * Any medium or large weapon.\n\
+    Make a DC 2 finesse check. The DC increases by 1 for every 4 damage the attack has. A partial success prevents the attack from dealing damage.\
+    A full success causes the attack or thrown object to hit the attacker instead. (Unless they're able to dodge or parry it).")
+register_feature("Radiative", "Protective Adaptation", "Reduces the tier of heat experienced by 1.")
+register_feature("Spiny Tail", "Protective Adaptation", "Creatures who hit you in melee range or grapple you will take 2d4 damage.")
+register_feature("Thick Fur", "Protective Adaptation", "While dry, reduce the tier of cold experienced by 1, and any creature adjacent to you who has less warmth pips than you gains 1 warmth pip per round.")
+register_feature("Adrenaline Rush", "Movement Adaptation", "|▶| Enter a rush state. While in this state, you have the haste condition. However, lose 1 HP or 1 food pip a round. You may end the effect at any time.")
+register_feature("Aquatic", "Movement Adaptation", "Your breath capacity is increased by five rounds, and items thrown by you act normally underwater. Speed is also increased by 2 while in water.")
+register_feature(
+    "Energy Launch", "Movement Adaptation",
+    "|▶, ⊚| Travel up to 10 distance in a straight line. If you crash into something, you stop.\n\
+    |▶, ⊚⊚| Travel up to 20 distance in a straight line. If you crash into something, you stop, and it takes 2d4 + Size damage. If the target is a creature, they are able to try and dodge.\n\
+    Neither of these can be done in the air.")
+register_feature("Grapple", "Movement Adaptation", "Select either a mouth, hand or back slot - they become a range 5 grapple, however it only functions when that slot is empty.", {"Reserve Food": "-2"})
+register_feature("High Metabolism", "Movement Adaptation", "You may take an extra action, but you cannot do this two turns in a row. Your speed is increased by 4, and your jump height is increased by 3.", {"Required Food": "+1", "Reserve Food": "-2"})
+register_feature("Sticky Paws", "Movement Adaptation", "You are able to climb on walls or larger creatures.", {"Required Food": "+1"})
+register_feature(
+    "Volatile Anatomy", "Movement Adaptation",
+    "|▶| Create a small explosion that sends you 5 distance in a straight line.\n\
+    |▶▶| Create a small explosion that stuns creatures within 3 distance of you.\n\
+    If a Volatile Anatomy action is used more than once in a round, you must succeed on a DC 2 endurance check or be stunned for one round.\n\
+    Incoming damage from explosions is halved.",
+    {"Karmic Balance": "-1"})
+register_feature("Wings", "Movement Adaptation", "|⊚⊚| You are flying for this round. This doesn't work while the wings are wet.", {"Required Food": "+1"})
+register_feature("Spirit Syphon", "Karmic Balance Adaptation", "When you kill a creature that is size 2 or larger, you gain 1 Blessing.", {"Required Food": "+1"})
+register_feature("The Wheel", "Karmic Balance Adaptation", "You gain +3 Max Blessings that cannot be reduced by negative Karmic Balance. Additionally, choose 1 Rite to gain.")
+
+@app.load
+@discohook.command.slash(
+    name="feature",
+    description="Get information about a feature",
+    options=[discohook.Option.string(name="name", required=True, description="Feature name")]
+)
+async def item_command(interaction: discohook.Interaction, name: str):
+    match = look_for(features, name)
+    if match is not None:
+        i = features[match]
+        e = discohook.Embed(title=i["name"], description=i["description"])
+        e.add_field(name="Type", value=i["kind"], inline=True)
+        for x in i["fields"]:
+            e.add_field(name=x, value=i["fields"][x], inline=True)
+        await interaction.response.send(embed=e)
+    else:
+        await interaction.response.send(content="I couldn't find that feature.")
 
 async def index(request: Request):
     return JSONResponse({"success": True}, status_code=200)
