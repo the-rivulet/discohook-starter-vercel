@@ -30,7 +30,7 @@ def look_for(l: dict, target: str):
         # find how many characters it shares
         for i in range(len(item)):
             x = 1
-            while item[i : (i + x)] in target:
+            while i + x <= len(item) and item[i : (i + x)] in target:
                 shared = max(shared, x)
                 x += 1
         if shared > best_share:
