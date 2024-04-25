@@ -38,12 +38,6 @@ def look_for(l: dict, target: str):
             best_match = item
     return best_match
 
-@app.load
-@discohook.command.slash(name="hello", description="Say hello")
-async def hello_command(interaction: discohook.Interaction):
-    username = interaction.author.global_name
-    await interaction.response.send(content=f"Hello, {username}!")
-
 items = {}
 def register_item(name: str, kind: str, size: str, description: str, fields: dict = {}):
     item = {"name": name, "kind": kind, "description": description, "size": size, "fields": fields}
@@ -366,6 +360,19 @@ rules = {
     * |▶| Swap the contents of two inventory or equipment slots with each other. \n\
     * |▶| With an adjacent creature, give or take an item in the hand. An opposing power check is required if they are unwilling.\
     Willing or not, the other creature does not spend an action as a part of the exchange.",
+    "taming creatures": "Creatures can be tamed by feeding them, then passing an influence check on them. Alternatively, rescuing them from a predator may greatly increase their trust in you.\n\
+    Tamed creatures will defend and follow their owner, any may allow the owner to ride them if they trust the owner enough.\n\
+    If the owner attacks them, or they're allowed to starve before fully bonding with the owner, their trust may be broken.\
+    Herbivores who have their trust broken will generally run away, attacking if they feel trapped. Carnivores and omnivores may turn on their owner and the group.",
+    "echoes": "The Echoes are the spiritual remnants of Rain World's previous civilized species, the Ancients. They are forever stuck between this world and transcendence.\
+    They were unable to ascend due to their many vices, especially those who were too arrogant or egotistical.\n\
+    Upon meeting an echo, they will speak to the group, while causing nearby non-sapient beings to fall limp. Once an echo is finished speaking, the group will awaken in the last shelter they slept in, at the start of the next cycle.\n\
+    On a sapient creature's first visit to each echo, their karmic attunement will deepen.\n\
+    * Their maximum karma increases by 1, to a maximum of 10.\n\
+    * If this would increase their maximum karma to 6, then increase it to 7 instead.\n\
+    * If maximum karma could not be increased, instead the creature selects a new rite to gain.\n\
+    * Their karma is increased to their new maximum value.\n\
+    * Their maximum blessings are increased by 2.",
     # Environment
     "acid": "A creature takes 2d4 damage upon moving into acid, or starting their turn within it. This damage counts as explosive damage.",
     "darkness": "Dark conditions limit the abilities of those who rely on sight. Anyone in a dark location gets -1D on any action which requires sight,\
@@ -463,7 +470,31 @@ rules = {
     * Flee the situation as fast as possible.\n\
     * Attack the nearest thing you fear. You have -1D to all checks while doing this.\n\
     * Lock up in place, taking no actions or movement.",
-    "unconscious": "You cannot move or perform actions, and your breath capacity drops to 0, until you are conscious again."
+    "unconscious": "You cannot move or perform actions, and your breath capacity drops to 0, until you are conscious again.",
+    # Iterators
+    "superstructure hazards": "Electrical Discharge: Some sections of an iterator's superstructure are shrouded from the rain, but pass electricity through them during work.\
+    Any creature in these sections when the rain arrives takes 1d6 damage per round, and any electrical equipment is charged.\n\
+    Gravity: Inside most functional superstructures, there is no gravity as a side effect of mass rarefaction cells. In such conditions, these effects apply:\n\
+    * Creatures can only change the direction they travel if they’re touching a surface or pole, or throw an object.\n\
+    * Creatures will not fall, instead continuing to travel in a straight line until they reach a surface or leave the area with zero gravity.\n\
+    Areas with multiple active mass rarefaction cells will have no gravity at all times. Areas with one functional mass rarefaction cell will result in gravity alternating between zero and standard every 3 rounds.",
+    "iterator puppets": "When in a puppet room, the iterator may react differently, depending on who entered.\n\
+    Assuming the iterator is in a functional state, they may, depending on their temperament:\n\
+    * Provide marks of communication, so that the creature can understand the ancients' language. (which iterators speak in)\n\
+    * Try to increase maximum karma as much as they can. (Usually to 10)\n\
+    * More karmically unbalanced creatures will be harder to boost.\n\
+    * Fill the food pips of the creature present.\n\
+    * Attempt to modify those in the room, and so providing new adaptations.\n\
+    * Attempt to eject or kill those in the room.\n\
+    Attempting to throw a singularity bomb will have a functional iterator throw it and everyone else out of the room, causing the creatures to die from the explosion outside the chamber.\
+    Against an iterator who is too damaged to fight back in such a manner, a singularity bomb will kill them.",
+    # Variants
+    "overeating": "You could allow characters to eat past their limit. In that case, apply these changes while above their limit:\n\
+    * Speed is dropped by 1 for every excess food pip, to a minimum of 1.\n\
+    * Incoming damage from attacks is reduced by 1 for every two excess food pips.\n\
+    * Size is increased by 1 for every three excess food pips.",
+    "shared pips": "Instead of each player having their own pip amount, all players add their pips together into an overall pool.\
+    This allows for much greater use of abilities, but means poor management can result in the whole group starving."
 }
 
 @app.load
@@ -485,6 +516,10 @@ features = {}
 def register_feature(name: str, kind: str, description: str, fields: dict = {}):
     feature = {"name": name, "kind": kind, "description": description, "fields": fields}
     features[name.lower()] = feature
+def register_rite(name: str, description: str, min_balance: int = 0, fields: dict = {}):
+    if min_balance > 0:
+        fields["Balance Required"] = str(min_balance)
+    register_feature(name, "Rite", description, fields)
 
 # Adaptations
 register_feature(
@@ -673,6 +708,63 @@ register_feature(
     * Failure: The hallucination is overwhelming, and you are stunned for the round.")
 register_feature("Pacifist", "Burden", "You are unable to purposely harm creatures.", {"Karmic Balance": "+2"})
 # Rites
+register_rite(
+    "Blast",
+    "When hitting a creature with an unarmed attack, you may choose to spend blessings to add damage.\n\
+    The first blessing per attack adds 1d4 + Will damage, and each extra one adds an extra 1d4.", 1)
+register_rite("Bubble", "|⦻| A chosen creature you can sense is given two additional rounds of air.", 1)
+register_rite(
+    "Connection",
+    "Once per cycle, select a creature you can sense (other than yourself) to link with. Attacking someone you are connected to breaks the connection.\n\
+    |▶, ⦻|Restore 1d4 + Will HP to the linked creature.\n\
+    If the linked creature dies, you can spend 1 karma to allow them to return at the start of the next cycle.", 2)
+register_rite("Delay", "|⦻| Lock a projectile you can sense in time. You may end this effect at any time to allow it to continue its path. Locking a projectile requires a will contest if it isn't yours.", 1)
+register_rite("Energy Spear", "|⦻| Materialise a spear made of hard light, to somewhere you can sense. It functions as a normal spear, but it will disappear at the end of the cycle.")
+register_rite("Flash", "|▶, ⦻⦻| Create a bright flash of light somewhere you can sense. Anyone else who can see the flash must succeed a DC 2 perception check or receive the blinded condition for 2 rounds.")
+register_rite("Flight", "|⦻⦻⦻| You are flying for this round.")
+register_rite(
+    "Frost",
+    "|▶, ⦻| Cool down an object or creature you can sense by 3 warmth pips.\n\
+    |▶, ⦻| Create a snowball in one's hand.\n\
+    |▶, ⦻⦻⦻| Freeze everything within 5 distance of a chosen location you can sense.")
+register_rite(
+    "Gateway",
+    "|▶, ⦻⦻| Open a portal between two locations you can sense, treating them as adjacent.\n\
+    If you want to keep a portal open past the round you opened it, you must spend an action each turn, or it will close. It will also close after [Will + 3] rounds have passed.\n\
+    Creatures who have a gateway opened on them may want to avoid going through. In that case, a contest of their agility versus the gateway user’s will occurs.\
+    If the creature trying to evade wins, they move one space instead of going through.")
+register_rite("Hasten", "|⦻| You or an adjacent creature receives the haste condition until the end of the round.")
+register_rite(
+    "Heat",
+    "|▶, ⦻| Heat up an object or creature you can sense by up to 3 warmth pips.\n\
+    |▶, ⦻| Set an adjacent object/creature on fire.\n\
+    |▶, ⦻⦻⦻| Set everything on fire within 5 distance of a chosen location you can sense.")
+register_rite(
+    "Item Recall",
+    "Select an item that you have when this rite is taken or when hibernating.\n\
+    |▶, ⦻⦻| The selected item is recalled into an empty slot or onto the ground in front of you.")
+register_rite("Karmic Barrier", "|▶, ⦻⦻| Materializes a karmic barrier for you or an adjacent target.\nA karmic barrier reduces the damage of the next incoming attack by Will + 1.", 2)
+register_rite("Leech", "When hitting a creature with an unarmed attack, you may choose to spend blessings to drain food pips from it, to add to your own. Every 2 blessings used drains 1 pip.")
+register_rite(
+    "Nullify",
+    "|▶, ⦻⦻⦻| Projects a nullification field at a point you can sense. The field affects anything within 5 distance of its centre, and lasts for up to [Will + 1] rounds or until you dismiss it.\n\
+    Any abilities used in there, which cost blessings or food pips, have those costs increased by 2.")
+register_rite("Reach", "|▶, ⦻| Perform an unarmed attack on a creature within [Will + 1] distance.")
+register_rite("Rejuvenation", "|▶▶, ⦻⦻| Restore 1d4 + Will HP to yourself or an adjacent target.", 3)
+register_rite(
+    "Rupture",
+    "|⦻| Shatters a spear within 10 distance of you that's on the ground or embedded. If it's embedded in a creature, it deals 1d6 damage to them.\n\
+    |▶, ⦻|: Attempt a DC 2 will check. A success lets you shatter a spear a creature within 10 distance is carrying.")
+register_rite("Sense", "Select an item when you take this rite.\n|▶, ⦻⦻| Determine the direction and rough distance of the nearest one. Blocked by karma gates.")
+register_rite(
+    "Telekinesis",
+    "|▶, ⦻|: Levitate items within 15 distance, up to a limit of your Will. Any items held by someone else require you succeed on a Will check contested by their Power check in order to grab them.\
+    Treat them as being in their own, temporary hand slots that last until you throw or drop them, or you move out of levitation range of them.",
+    2)
+register_rite(
+    "Void Room",
+    "|▶▶, ⦻⦻| Creates a portal to a shelter sized room. The portal lasts as long as is required, and lets anything through it. Only one portal can be open at a time. Any living creatures will be forced out of the room when the portal closes.\n\
+    Each creature with the Void Room rite has their own unique room. Closing a void room also closes any void rooms inside of it.")
 
 @app.load
 @discohook.command.slash(
@@ -684,6 +776,51 @@ async def item_command(interaction: discohook.Interaction, name: str):
     match = look_for(features, name)
     if match is not None:
         i = features[match]
+        e = discohook.Embed(title=i["name"], description=i["description"])
+        e.add_field(name="Type", value=i["kind"], inline=True)
+        for x in i["fields"]:
+            e.add_field(name=x, value=i["fields"][x], inline=True)
+        await interaction.response.send(embed=e)
+    else:
+        await interaction.response.send(content="I couldn't find that feature.")
+
+creatures = {}
+def register_creature(name: str, kind: str, description: str, fields: dict = {}):
+    creature = {"name": name, "kind": kind, "description": description, "fields": fields}
+    creatures[name.lower()] = creature
+
+register_creature(
+    "Batfly", "Arthropod", "Able to fly.",
+    {"HP": "1", "Corpse": "Insect, 1 pip", "Speed": "6", "Size": "1", "Breath": "1"})
+register_creature(
+    "Spider", "Arthropod", "|▶| Chain with an adjacent spider to form a Coalescipede swarm.\n\
+    Size is equal to the number of spiders in the swarm.\n\
+    Instead of being killed by an attack, the swarm will split into two equal halves.",
+    {"HP": "1", "Diet": "Carnivore (2|1)", "Corpse": "Insect, 0 pips", "Speed": "8",
+    "Size": "1", "Breath": "3", "Unarmed Attack": "1d4 + Size bite"})
+register_creature(
+    "Big Spider", "Arthropod", "Able to walk on walls and ceilings.\nRegains 1 HP at the start of its turn.\nHas a jump height of 2.\n\
+    |▶▶| At the start of the spider's next turn, move up to 5 distance in a straight line. If this contacts a creature, the big spider can perform one unarmed attack on it without expending another action.\n\
+    |▶▶| Revive a Big Spider or Spitter Spider who had died within the past five rounds, with 1 HP.\n\
+    This doesn't work if the spider was killed by Spore Puffs, or has been fully eaten.",
+    {"HP": "6", "Diet": "Carnivore (4|3)", "Corpse": "Meat, 3 pips", "Speed": "7",
+    "Size": "4", "Breath": "9", "Unarmed Attack": "2d4 + Power bite"})
+register_creature(
+    "Big Spider", "Arthropod", "Able to walk on walls and ceilings.\nRegains 1 HP at the start of its turn.\n\
+    |▶| Throw two dart maggots. On impact, they reduce the creature's speed by 3 for one round. If this reduces a creature's speed to 0, then they are knocked unconscious for the round.",
+    {"HP": "11", "Diet": "Carnivore (7|3)", "Corpse": "Meat, 4 pips", "Speed": "7",
+    "Size": "5", "Breath": "8", "Unarmed Attack": "2d4 + Power bite"})
+
+@app.load
+@discohook.command.slash(
+    name="creature",
+    description="Get information about a creature",
+    options=[discohook.Option.string(name="name", required=True, description="Creature name")]
+)
+async def creature_command(interaction: discohook.Interaction, name: str):
+    match = look_for(creatures, name)
+    if match is not None:
+        i = creatures[match]
         e = discohook.Embed(title=i["name"], description=i["description"])
         e.add_field(name="Type", value=i["kind"], inline=True)
         for x in i["fields"]:
