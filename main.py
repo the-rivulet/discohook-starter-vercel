@@ -249,10 +249,10 @@ async def item_command(interaction: discohook.Interaction, item: str):
     n = None
     prevMatches = []
     for x in range(len(item.lower())-1, 0, -1):
+        part = item[0:x]
         if part in items:
             n = part
             break
-        part = item[0:x]
         matches = list(filter(lambda other: part in other, items.keys()))
         if len(matches) == 0:
             if len(prevMatches) > 0:
