@@ -450,8 +450,8 @@ rules = {
     "on fire": "You take 1d4 damage per round until you are hit by water or enter a body of water.\
     Alternatively, you can spend an action to attempt to put out the flames with a skill check.",
     "pinned": "You are stuck to a surface by the object or creature pinning you, and your agility is reduced by 2 while pinned.\
-    On your turn, make a power contest against the object or creature pinning you. Every contest you fail, you gain +1D to free yourself until you succeed.\
-    You may be assisted by allied creatures.",
+    Once per turn, you may spend one action to make a power contest against the creature pinning you (for a creature) or a power check against the DC of the applying effect (for an object), breaking free on a success.\
+    Every contest you fail, you gain +1D to free yourself until you succeed. Other creatures may also make this check once per turn, benefitting from the extra dice pool you've gained, but not adding to it.",
     "reinforcement": "The next time you would lose karma, instead lose this condition.\
     If it was due to death, a karma flower will sprout near the spot you died. The condition is also lost if you enter starvation.",
     "starvation": "Unless your reserve and required pips are full, these effects apply:\n\
@@ -804,12 +804,23 @@ register_creature(
     |▶▶| Revive a Big Spider or Spitter Spider who had died within the past five rounds, with 1 HP.\n\
     This doesn't work if the spider was killed by Spore Puffs, or has been fully eaten.",
     {"HP": "6", "Diet": "Carnivore (4|3)", "Corpse": "Meat, 3 pips", "Speed": "7",
-    "Size": "4", "Breath": "9", "Unarmed Attack": "2d4 + Power bite"})
+    "Size": "4", "Breath": "9", "Unarmed Attack": "2d4 bite"})
 register_creature(
-    "Big Spider", "Arthropod", "Able to walk on walls and ceilings.\nRegains 1 HP at the start of its turn.\n\
+    "Spitter Spider", "Arthropod", "Able to walk on walls and ceilings.\nRegains 1 HP at the start of its turn.\n\
     |▶| Throw two dart maggots. On impact, they reduce the creature's speed by 3 for one round. If this reduces a creature's speed to 0, then they are knocked unconscious for the round.",
     {"HP": "11", "Diet": "Carnivore (7|3)", "Corpse": "Meat, 4 pips", "Speed": "7",
-    "Size": "5", "Breath": "8", "Unarmed Attack": "2d4 + Power bite"})
+    "Size": "5", "Breath": "8", "Unarmed Attack": "2d4 + 1 bite"})
+register_creature(
+    "Mother Spider", "Arthropod", "When killed, it releases 1d4 spiders.",
+    {"HP": "11", "Diet": "Carnivore (6|3)", "Corpse": "Meat, 6 pips", "Speed": "4",
+    "Size": "4", "Breath": "7", "Unarmed Attack": "1d6 + 1 bite"})
+register_creature(
+    "Dropwig", "Arthropod", "Able to walk on walls and ceilings.\nAble to carry objects with its mouth, and drop them to set as bait.",
+    {"HP": "10", "Diet": "Carnivore (4|2)", "Corpse": "Meat, 3 pips", "Speed": "10",
+    "Size": "4", "Breath": "7", "Unarmed Attack": "2d4 slash"})
+register_creature(
+    "Eggbug", "Arthropod", "Able to walk on walls and ceilings.\nDrops 6 eggbug eggs on death.",
+    {"HP": "2", "Diet": "Herbivore (2|1)", "Corpse": "Meat, 1 pips", "Speed": "12", "Size": "3", "Breath": "8"})
 
 @app.load
 @discohook.command.slash(
