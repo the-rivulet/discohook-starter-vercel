@@ -22,6 +22,10 @@ app = discohook.Client(
 )
 
 def look_for(l: dict, target: str):
+    # check for exact matches
+    for i in l:
+        if i == target:
+            return i
     # look for the closest match
     best_match = None
     best_share = 0
@@ -673,6 +677,17 @@ register_feature(
     Your size is decreased by 1. Your corpse is worth 1 less food pip.",
     {"Required Food": "-1", "Reserve Food": "-1"})
 register_feature("Survival Instincts", "Other Adaptation", "|⊚⊚| Reroll any failures on your current skill check, once.")
+register_feature(
+    "Internal Reactor", "Item Adaptation",
+    "You have one 'Core' slot, which fits certain items. There, they provide bonus effects, and can be ejected, which is effectively a throw.\n\
+    * Electric Spear: +1 pip/cycle if charged.\n\
+    * Jellyfish: +1 pip/cycle.\n\
+    * Infant Centipede (Dead): +1 pip/cycle\n\
+    * Infant Centipede (Alive): +2 pips/cycle. Won't attack if they are fed.\n\
+    * Fire Egg: +d4 - 1 pips/cycle.\n\
+    * Singularity Bomb: +3 pips/cycle.\n\
+    * MRC: +4 pips/cycle, can be used.",
+    {"Required Pips": "+2"})
 # Burdens
 register_feature(
     "Blinded", "Burden",
@@ -776,62 +791,6 @@ async def item_command(interaction: discohook.Interaction, name: str):
     match = look_for(features, name)
     if match is not None:
         i = features[match]
-        e = discohook.Embed(title=i["name"], description=i["description"])
-        e.add_field(name="Type", value=i["kind"], inline=True)
-        for x in i["fields"]:
-            e.add_field(name=x, value=i["fields"][x], inline=True)
-        await interaction.response.send(embed=e)
-    else:
-        await interaction.response.send(content="I couldn't find that feature.")
-
-creatures = {}
-def register_creature(name: str, kind: str, description: str, fields: dict = {}):
-    creature = {"name": name, "kind": kind, "description": description, "fields": fields}
-    creatures[name.lower()] = creature
-
-register_creature(
-    "Batfly", "Arthropod", "Able to fly.",
-    {"HP": "1", "Corpse": "Insect, 1 pip", "Speed": "6", "Size": "1", "Breath": "1"})
-register_creature(
-    "Spider", "Arthropod", "|▶| Chain with an adjacent spider to form a Coalescipede swarm.\n\
-    Size is equal to the number of spiders in the swarm.\n\
-    Instead of being killed by an attack, the swarm will split into two equal halves.",
-    {"HP": "1", "Diet": "Carnivore (2|1)", "Corpse": "Insect, 0 pips", "Speed": "8",
-    "Size": "1", "Breath": "3", "Unarmed Attack": "1d4 + Size bite"})
-register_creature(
-    "Big Spider", "Arthropod", "Able to walk on walls and ceilings.\nRegains 1 HP at the start of its turn.\nHas a jump height of 2.\n\
-    |▶▶| At the start of the spider's next turn, move up to 5 distance in a straight line. If this contacts a creature, the big spider can perform one unarmed attack on it without expending another action.\n\
-    |▶▶| Revive a Big Spider or Spitter Spider who had died within the past five rounds, with 1 HP.\n\
-    This doesn't work if the spider was killed by Spore Puffs, or has been fully eaten.",
-    {"HP": "6", "Diet": "Carnivore (4|3)", "Corpse": "Meat, 3 pips", "Speed": "7",
-    "Size": "4", "Breath": "9", "Unarmed Attack": "2d4 bite"})
-register_creature(
-    "Spitter Spider", "Arthropod", "Able to walk on walls and ceilings.\nRegains 1 HP at the start of its turn.\n\
-    |▶| Throw two dart maggots. On impact, they reduce the creature's speed by 3 for one round. If this reduces a creature's speed to 0, then they are knocked unconscious for the round.",
-    {"HP": "11", "Diet": "Carnivore (7|3)", "Corpse": "Meat, 4 pips", "Speed": "7",
-    "Size": "5", "Breath": "8", "Unarmed Attack": "2d4 + 1 bite"})
-register_creature(
-    "Mother Spider", "Arthropod", "When killed, it releases 1d4 spiders.",
-    {"HP": "11", "Diet": "Carnivore (6|3)", "Corpse": "Meat, 6 pips", "Speed": "4",
-    "Size": "4", "Breath": "7", "Unarmed Attack": "1d6 + 1 bite"})
-register_creature(
-    "Dropwig", "Arthropod", "Able to walk on walls and ceilings.\nAble to carry objects with its mouth, and drop them to set as bait.",
-    {"HP": "10", "Diet": "Carnivore (4|2)", "Corpse": "Meat, 3 pips", "Speed": "10",
-    "Size": "4", "Breath": "7", "Unarmed Attack": "2d4 slash"})
-register_creature(
-    "Eggbug", "Arthropod", "Able to walk on walls and ceilings.\nDrops 6 eggbug eggs on death.",
-    {"HP": "2", "Diet": "Herbivore (2|1)", "Corpse": "Meat, 1 pips", "Speed": "12", "Size": "3", "Breath": "8"})
-
-@app.load
-@discohook.command.slash(
-    name="creature",
-    description="Get information about a creature",
-    options=[discohook.Option.string(name="name", required=True, description="Creature name")]
-)
-async def creature_command(interaction: discohook.Interaction, name: str):
-    match = look_for(creatures, name)
-    if match is not None:
-        i = creatures[match]
         e = discohook.Embed(title=i["name"], description=i["description"])
         e.add_field(name="Type", value=i["kind"], inline=True)
         for x in i["fields"]:
