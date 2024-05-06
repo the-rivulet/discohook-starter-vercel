@@ -443,7 +443,7 @@ rules = {
     Make a finesse check contested with the target's agility check. If the attacker has equal or more successes, the attack hits.\
     An unarmed attack deals damage as specified by your species; a weapon applies its strike effect to the target.",
     # Conditions
-    "blinded": "You are unable to see, and will automatically fail any checks that involve sight.",
+    "blinded": "You are unable to see, and will automatically fail any checks that involve sight, unless you have some alternative means of sensing which will work.",
     "exhausted": "You lose your agility bonus to your speed, and have -1D to all skill checks.\n\
     You may choose to ignore these effects for one round, but must perform a DC 3 endurance check each time you do so:\n\
     * Success: You push through.\n\
@@ -679,11 +679,11 @@ register_feature(
 register_feature("Survival Instincts", "Other Adaptation", "|⊚⊚| Reroll any failures on your current skill check, once.")
 register_feature(
     "Internal Reactor", "Item Adaptation",
-    "You have one 'Core' slot, which fits certain items. There, they provide bonus effects, and can be ejected, which is effectively a throw.\n\
+    "You have one 'Core' slot, which fits certain items. There, they provide food pips at the start of each cycle, and can be ejected, which is effectively a throw.\n\
     * Electric Spear: +1 pip/cycle if charged.\n\
     * Jellyfish: +1 pip/cycle.\n\
     * Infant Centipede (Dead): +1 pip/cycle\n\
-    * Infant Centipede (Alive): +2 pips/cycle. Won't attack if they are fed.\n\
+    * Infant Centipede (Alive): +2 pips/cycle. Won't attack.\n\
     * Fire Egg: +d4 - 1 pips/cycle.\n\
     * Singularity Bomb: +3 pips/cycle.\n\
     * MRC: +4 pips/cycle, can be used.",
@@ -691,7 +691,7 @@ register_feature(
 # Burdens
 register_feature(
     "Blinded", "Burden",
-    "You are unable to see and will automatically fail any Perception checks that involve sight.\n\
+    "You always have the blinded condition.\n\
     You are immune to the effects of darkness and bright lights.",
     {"Required Food": "-1"})
 register_feature("Declawed", "Burden", "Lose a hand item slot.", {"Required Food": "-1"})
