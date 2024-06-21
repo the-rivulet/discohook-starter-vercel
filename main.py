@@ -319,6 +319,9 @@ rules = {
     "death": "Upon death, a creature loses 1 karma, and wakes up at the start of the next cycle in their last safe resting place.\
     For player characters, they wake up in the next shelter the group enters (unless the entire group is wiped out).\n\
     If a creature dies at 1 karma, they disconnect from the cycles the rest of the group experiences, and so a new character must be created.",
+    "hiding": "You can choose to hide from creatures. When a creature may be able to spot you, using an opposed skill check (their perception VS your stealth) If you have more successes, you can remain undetected.\n\
+    Attacks made against creatures who can't find you are made with +1D to hit.\n\
+    If they have equal or more successes, they spot you. If it's blatantly clear that you're there, you will be spotted without a roll.",
     "karma gates": "These are colossal airlocks which separate the regions of Rain World from each other. These gates will only open once per cycle,\
     when a creature stands within the chamber, who has at least as much Karma as the symbol on the wall represents.\
     Karma Gates may have a different symbol when approaching it from the other side.\n\
@@ -622,6 +625,11 @@ register_feature("Imitator", "Support Adaptation", "|▶| Imitate the sound of a
 register_feature("Luminescent", "Support Adaptation", "You provide light within 5 distance of yourself.")
 register_feature("Signal Antennae", "Support Adaptation", "|▶| Send a telepathic message to another creature within the same region as you.")
 register_feature(
+    "Terrifying Presence", "Support Adaptation",
+    "The first time a creature senses you in a cycle, you may perform a contest of your Influence against their Will or Comprehension. (Their choice)\n\
+    You receive -1D for every 2 size you are smaller than the creature. If the creature wins, they are unaffected.\
+    Equal successes means they will not attack you if possible (cornering them can override that). If you win, the creature gains the terrified condition.")
+register_feature(
     "Tracker", "Support Adaptation",
     "|▶, ⊚| Mark a creature which you can sense.\
     For 3 rounds, or until another creature is marked, you and your allies roll an extra 1D to hit the creature, and deal extra damage upon a successful hit, equal to your perception + 1.",
@@ -734,9 +742,10 @@ register_rite(
     |▶, ⦻|Restore 1d4 + Will HP to the linked creature.\n\
     If the linked creature dies, you can spend 1 karma to allow them to return at the start of the next cycle.", 2)
 register_rite("Delay", "|⦻| Lock a projectile you can sense in time. You may end this effect at any time to allow it to continue its path. Locking a projectile requires a will contest if it isn't yours.", 1)
-register_rite("Energy Spear", "|⦻| Materialise a spear made of hard light, to somewhere you can sense. It functions as a normal spear, but it will disappear at the end of the cycle.")
+register_rite("Energy Spear", "|⦻| Materialise a spear made of hard light, to somewhere you can sense. It functions as a normal spear, but it will disappear at the end of the cycle.", 1)
+register_rite("Evade", "|⦻| A chosen creature you can sense gains +1D to their next dodge or parry. This bonus cannot stack with itself.")
 register_rite("Flash", "|▶, ⦻⦻| Create a bright flash of light somewhere you can sense. Anyone else who can see the flash must succeed a DC 2 perception check or receive the blinded condition for 2 rounds.")
-register_rite("Flight", "|⦻⦻⦻| You are flying for this round.")
+register_rite("Flight", "|⦻⦻⦻| You are flying for this round.", 3)
 register_rite(
     "Frost",
     "|▶, ⦻| Cool down an object or creature you can sense by 3 warmth pips.\n\
@@ -774,8 +783,7 @@ register_rite("Sense", "Select an item when you take this rite.\n|▶, ⦻⦻| D
 register_rite(
     "Telekinesis",
     "|▶, ⦻|: Levitate items within 15 distance, up to a limit of your Will. Any items held by someone else require you succeed on a Will check contested by their Power check in order to grab them.\
-    Treat them as being in their own, temporary hand slots that last until you throw or drop them, or you move out of levitation range of them.",
-    2)
+    Treat them as being in their own, temporary hand slots that last until you throw or drop them, or you move out of levitation range of them.", 2)
 register_rite(
     "Void Room",
     "|▶▶, ⦻⦻| Creates a portal to a shelter sized room. The portal lasts as long as is required, and lets anything through it. Only one portal can be open at a time. Any living creatures will be forced out of the room when the portal closes.\n\
