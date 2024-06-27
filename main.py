@@ -592,7 +592,12 @@ register_feature(
     If a Volatile Anatomy action is used more than once in a round, you must succeed on a DC 2 endurance check or be stunned for one round.\n\
     Incoming damage from explosions is halved.",
     {"Karmic Balance": "-1"})
-register_feature("Wings", "Movement Adaptation", "|⊚⊚| You are flying for this round. This doesn't work while the wings are wet.", {"Required Food": "+1"})
+register_feature(
+    "Wings", "Movement Adaptation",
+    "|⊚| You will not fall at the end of your turn for this round.\n\
+    |⊚| Until the end of your turn, you can move freely, ignoring jump height.\n\
+    Wings do not function while they are wet.",
+    {"Required Food": "+1"})
 register_feature("Spirit Syphon", "Karmic Balance Adaptation", "When you kill a creature that is size 2 or larger, you gain 1 Blessing.", {"Required Food": "+1"})
 register_feature("The Wheel", "Karmic Balance Adaptation", "You gain +3 Max Blessings that cannot be reduced by negative Karmic Balance. Additionally, choose 1 Rite to gain.")
 register_feature(
