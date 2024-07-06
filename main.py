@@ -17,7 +17,7 @@ app = discohook.Client(
     token=APPLICATION_TOKEN,
     public_key=APPLICATION_PUBLIC_KEY,
     password=APPLICATION_PASSWORD,
-    default_help_command=True,
+    default_help_command=False,
     middleware=[Middleware(SingleUseSessionMiddleware)],
 )
 
@@ -343,11 +343,26 @@ rules = {
     * If the pip reduction brings your food pips into the negatives, set them to 0 and receive the starvation condition.\n\
     Shelter Breakage: Shelters can occasionally malfunction. When they do, the shelter doors are forced open, allowing water to flood some or all of the shelter.\
     Anyone inside will need to seek out another shelter, while evading regular downpours.",
-    "toll passages": "Some areas are guarded and require the group to be processed in order to proceed.\
-    Typically, such guarded checkpoints have several creatures of one species, all armed with the best weapons they have access to.\
-    They may attack those who try to cross without paying, unless the people crossing are trusted by the guards.\n\
-    Payment required typically must reach a trade value of 10. Keep in mind that different groups may value items differently from this,\
-    and that players may want to make influence checks to lower or bypass the price.",
+    "foraging": "When travelling, it’s often that one will need to take time to search for resources.\n\
+    Dependent on the cycle time, your GM may allow you to take a foraging trip in order to find items which you need.\n\
+    To perform a foraging trip, each person searching will need to decide for the item category they are searching for, then perform a Perception Check.\n\
+    Once done, you can roll on the tables three times. Each time, roll [2d4 + Successes] to determine what you get. Each one can be from a different category.",
+    "trading": "When trading items, traders will usually want to receive 2 more value than they are giving up. In some cases, they may feel reluctant to give up certain items at all.",
+    "food value": "Check off each condition on the two tables below. Skip the consumption effect table if it’s not going to be consumed. (Whether because of an incompatible diet, or the food being spoiled)\n\n\
+    Provides food pips: +Pips\nGrants breath capacity increase: +2 if the region has a lot of water.\nGrants haste: +2\nGrants the luminescent adaptation: +4\nGrants reinforcement: +5\n\n\
+    Provides protection against worm grass: +1 if the region has worm grass.\nProvides light within 1 distance of itself: +1\n\
+    Provides light within 3+ distance of itself: +2\nHas an impact effect: +3\nCan hatch into a creature, and trader wants to hatch it: +Size of adult creature.",
+    "tolls": "Some areas are guarded and require the group to be processed in order to proceed.\n\
+    Typically, such guarded checkpoints have several creatures of one species, all armed with the best weapons they have access to. They may attack those who try to cross without paying, unless the people crossing are trusted by the guards.\n\
+    Payment required typically must reach a trade value of 10 in order to allow the group to pass.",
+    "lowering the price": "A group can try to lower the price of a trader or toll once per cycle.\n\
+    To do this, they must decide on a new price. One influence check is then performed. The DC is equal to half of the price reduction, rounded up.\n\
+    * Success: The offer is accepted.\n\
+    * Partial Success: The trader / toll owner won’t accept, but will compromise in some way if there’s room to do so.\n\
+    * Failure: The offer is rejected outright.\n\
+    A particularly extreme failure can be seen as an insult to the trader or toll owner.",
+    "sounds": "Most things which make noise can be heard from up to 20 distance away, plus your perception. Explosions and other loud sounds can be heard from double the range.\n\
+    When trying to hear a sound when it is not in the same room, treat it as if it were 20 distance further away.",
     "passages": "When you have completed a major objective, your “passage” count increases by 1. Choose from one of these bonuses when this occurs:\n\
     * +2 to one skill of your choice.\n\
     * +1 to two different skills of your choice.\n\
@@ -501,7 +516,29 @@ rules = {
     * Incoming damage from attacks is reduced by 1 for every two excess food pips.\n\
     * Size is increased by 1 for every three excess food pips.",
     "shared pips": "Instead of each player having their own pip amount, all players add their pips together into an overall pool.\
-    This allows for much greater use of abilities, but means poor management can result in the whole group starving."
+    This allows for much greater use of abilities, but means poor management can result in the whole group starving.",
+    # etc
+    "adaptations": "Adaptations are modifications to your character, allowing for vastly different abilities and playstyles.\
+    You can select them at character creation or complete Passages in order to gain new ones.\
+    The number of Adaptations is determined by the column chosen on the table in Skills & Affinities.\n\
+    You cannot have multiple copies of the same adaptation, unless they are two different variants of it.\n\
+    The following shorthand is used in descriptions of Adaptations:\n\
+    * |▶| means it costs one action.\n\
+    * |⊚| means it costs one food pip.\n\
+    * |⦻| means it costs one Blessing.",
+    "burdens": "Optionally, up to four burdens can be taken, which reduce your capabilities in some manner.",
+    "rites": "Rites are powerful abilities that relate the karmic energies of the world that use your Blessings.\
+    To use certain Rites, you need to have enough Karmic Balance, which is determined by your diet and chosen adaptations.\
+    You start with a number of Rites equal to your Karmic Balance (minimum of 0 Rites).\n\
+    The following shorthand is used in descriptions of Rites:\n\
+    * |▶| means it costs one action.\n\
+    * |⊚| means it costs one food pip.\n\
+    * |⦻| means it costs one Blessing.\n\
+    Something 'you can sense' is anything you can see, hear, or touch.",
+    "songs": "Songs are a type of rite, which require an instrument in order to use. Their effects do not stack on a creature.\n\
+    |▶▶| Start a new song. It will last until the end of your next turn.\n\
+    |▶| Maintain the current song, delaying its ending by one turn. You can only have one maintained at a time.\n\
+    Each turn you are playing a song, perform an influence skill check. Creatures who hear it must beat your skill check with an influence or will check of their own, or be affected."
 }
 
 @app.load
@@ -527,6 +564,8 @@ def register_rite(name: str, description: str, min_balance: int = 0, fields: dic
     if min_balance > 0:
         fields["Balance Required"] = str(min_balance)
     register_feature(name, "Rite", description, fields)
+def register_song(name: str, description: str, fields: dict = {}):
+    register_feature(name, "Song", description, fields)
 
 # Adaptations
 register_feature(
@@ -793,11 +832,21 @@ register_rite(
     "Void Room",
     "|▶▶, ⦻⦻| Creates a portal to a shelter sized room. The portal lasts as long as is required, and lets anything through it. Only one portal can be open at a time. Any living creatures will be forced out of the room when the portal closes.\n\
     Each creature with the Void Room rite has their own unique room. Closing a void room also closes any void rooms inside of it.")
+# Songs
+register_song("Deafening Harmony", "Everyone who can hear it gets -1D to any checks involving hearing for its duration. It’s also considered very loud for anyone with sensitive ears.")
+register_song(
+    "Encouraging Melody",
+    "One specific creature, chosen at the start, gets +1D on skill checks during their turn, on each round this is playing.\n\
+    Outside of battle, it can be used before a check to try and aid another. It is a DC 3 influence check, with a success meaning the recipient gets +1D on their own check.")
+register_song("Relay Melody", "One specific creature, chosen at the start of the song, gets haste for rounds this is playing.")
+register_song("Slow Melody", "Hostile creatures are slowed for rounds this is playing.")
+register_song("Staggering Melody", "Hostile creatures are staggered for rounds this is playing.")
+register_song("Taunting Melody", "Hostile creatures will only target you for rounds this is playing.")
 
 @app.load
 @discohook.command.slash(
     name="feature",
-    description="Get information about a feature",
+    description="Get information about an adaptation, rite, or burden",
     options=[discohook.Option.string(name="name", required=True, description="Feature name")]
 )
 async def item_command(interaction: discohook.Interaction, name: str):
