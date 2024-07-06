@@ -861,6 +861,15 @@ async def item_command(interaction: discohook.Interaction, name: str):
     else:
         await interaction.response.send(content="I couldn't find that feature.")
 
+@app.load
+@discohook.command.slash(
+    name = "help",
+    description="Get info & help about the bot",
+    options=[]
+)
+async def help_command(interaction: discohook.Interaction, name: str):
+    await interaction.response.send(content="Neuron is a Monsoon reference bot developed by Rivu (the.rivulet) and it is updated as of Monsoon **1.0.0**.")
+
 async def index(request: Request):
     return JSONResponse({"success": True}, status_code=200)
 app.add_route("/", index, methods=["GET"], include_in_schema=False)
