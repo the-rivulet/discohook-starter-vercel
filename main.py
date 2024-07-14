@@ -869,7 +869,7 @@ async def item_command(interaction: discohook.Interaction, name: str):
     description="Get info & help about the bot",
     options=[]
 )
-async def help_command(interaction: discohook.Interaction, name: str):
+async def help_command(interaction: discohook.Interaction):
     await interaction.response.send(content="Neuron is a Monsoon reference bot developed by Rivu (the.rivulet) and it is updated as of Monsoon **1.0.0**.")
 
 async def index(request: Request):
