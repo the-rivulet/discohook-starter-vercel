@@ -222,7 +222,7 @@ register_item(
     "+1 influence while worn. This can bring influence beyond its usual maximum.\nReduces the tier of high temperatures experienced by 1.")
 register_item(
     "Headset", "Head", "Medium",
-    "Can speak with allies wearing a headset who are in the same region.\nEar protection, and provides immunity to sound-based attacks.")
+    "Can speak with allies wearing a headset who are in the same region.\nAny instruments you play will also play at the headsets of your allies.\nProvides ear protection and immunity to sound-based attacks.")
 register_item("Head Lantern", "Head", "Small", "Provides light within 4 distance of itself.", {"Trade Value": "3"})
 register_item(
     "Chieftain Scavenger Mask", "Face", "Medium",
@@ -399,9 +399,10 @@ rules = {
     "acid": "A creature takes 2d4 damage upon moving into acid, or starting their turn within it. This damage counts as explosive damage.",
     "darkness": "Dark conditions limit the abilities of those who rely on sight. Anyone in a dark location gets -1D on any action which requires sight,\
     such as when trying to hit someone with a thrown object.Anyone who is in total darkness will also receive the blinded condition.",
-    "falling": "Creatures fall at the end of their turn if they cannot fly and they're not in water, on ground they can walk on, or hanging onto a pole.\n\
+    "falling": "A creature can fall up to 10 distance without being harmed, +2 per point of stealth they have.\
+    Every point of distance beyond that causes them to take 1 damage.\n\
     On landing, a creature will take 1 damage for every point of distance they fell beyond 10.\n\
-    A creature can use an agility skill check to reduce the damage. Each success drops the damage by 1.\n\
+    If a creature falls far enough to potentially take damage, they lose half of their remaining speed on landing, rounded up.\n\
     If a creature lands on another, half of the fall damage is transferred from the faller to the creature fallen on, rounded up.\
     One extra point of damage is transferred for every point of size the faller has.",
     "extreme temperatures": "Warmth pips change each round, dependent on the environment:\n\
@@ -570,7 +571,7 @@ def register_song(name: str, description: str, fields: dict = {}):
 # Adaptations
 register_feature(
     "Acidic Bile", "Aggressive Adaptation",
-    "|▶, ⊚| Shoot a glob of acid at a target. Treat as a thrown projectile that deals 2d4 damage on impact.",
+    "|▶, ⊚| Shoot a glob of acid at a target. Treat as a thrown projectile that deals 2d4 + Endurance damage on impact.",
     {"Required Food": "+1"})
 register_feature("Aggressive Nature", "Aggressive Adaptation", "Improve your unarmed attack's damage die by one step. (1 → 1d4 → 2d4 → 3d4)", {"Karmic Balance": "-1"})
 register_feature("Powerful", "Aggressive Adaptation", "When making an attack, you may choose to reroll your damage dice once. You must take the new damage roll.")
@@ -594,7 +595,7 @@ register_feature(
     "|▶| Spit at a creature. Treat as a thrown projectile with this impact effect: Creature's movement speed is reduced by 2 and they suffer -1D on any Agility checks made during their next turn.",
     {"Required Food": "+1"})
 register_feature("Spontaneous Combusion", "Aggressive Adaptation", "|⊚| Receive the on fire condition.\nIncoming damage from burning is halved.\nYour unarmed attack sets anything you hit on fire while you are burning.")
-register_feature("Blood Drain", "Protective Adaptation", "When you kill a creature that is size 2 or larger, you gain 2 HP.", {"Required Food": "+1"})
+register_feature("Blood Drain", "Protective Adaptation", "Every time you hit a size 2+ creature with a melee/unarmed attack, you gain 1 HP. ", {"Required Food": "+1"})
 register_feature(
     "Chromatophores", "Protective Adaptation",
     "|▶| Enter camouflage, granting you +2D when making stealth checks. You must spend 1 food pip for every action you make during camouflage. This may be deactivated at any time.",
@@ -623,6 +624,7 @@ register_feature(
     Neither of these can be done in the air.")
 register_feature("Grapple", "Movement Adaptation", "Select either a mouth, hand or back slot - they become a range 5 grapple, however it only functions when that slot is empty.", {"Reserve Food": "-2"})
 register_feature("High Metabolism", "Movement Adaptation", "You may take an extra action, but you cannot do this two turns in a row. Your speed is increased by 4, and your jump height is increased by 3.", {"Required Food": "+1", "Reserve Food": "-2"})
+register_feature("Pole Weaver", "Movement Adaptation", "While on a pole, your speed increases by your agility skill.\nYour jump height is increased by 4 while on a pole.")
 register_feature("Sticky Paws", "Movement Adaptation", "You are able to climb on walls or larger creatures.", {"Required Food": "+1"})
 register_feature(
     "Volatile Anatomy", "Movement Adaptation",
@@ -637,7 +639,7 @@ register_feature(
     |⊚| Until the end of your turn, you can move freely, ignoring jump height.\n\
     Wings do not function while they are wet.",
     {"Required Food": "+1"})
-register_feature("Spirit Syphon", "Karmic Balance Adaptation", "When you kill a creature that is size 2 or larger, you gain 1 Blessing.", {"Required Food": "+1"})
+register_feature("Spirit Syphon", "Karmic Balance Adaptation", "When a size 2+ creature is killed, which you have dealt damage to this cycle, you gain 1 Blessing.", {"Required Food": "+1"})
 register_feature("The Wheel", "Karmic Balance Adaptation", "You gain +3 Max Blessings that cannot be reduced by negative Karmic Balance. Additionally, choose 1 Rite to gain.")
 register_feature(
     "Childbearer", "Ally Adaptation",
@@ -655,7 +657,7 @@ register_feature(
     * Red, caramel, and train lizards must be hatchlings.")
 register_feature(
     "Neuron Cluster", "Ally Adaptation",
-    "Your comprehension represents neuron flies. You can spend 1 comprehension to fully block an attack aimed at you, or to add a neuron fly to your inventory.\
+    "Your comprehension represents neuron flies. Once per cycle, you can spend 1 comprehension to fully block an attack aimed at you, or to add a neuron fly to your inventory.\
     You cannot if it's at  -1, as you'd lose your last neuron fly.\n\
     |▶| Add a held neuron fly to your neuron cluster. Remove the item, and gain 1 comprehension. This cannot bring comprehension above 6.")
 register_feature("Operator", "Ally Adaptation", "You have an overseer which you can send commands to by spending an action. If the overseer is destroyed, it cannot be used until a new one shows up at the start of the next cycle.")
@@ -715,7 +717,7 @@ register_feature(
     "Your unarmed attack now pins creatures to the rot cysts on your body. If you kill a creature using an unarmed attack, you destroy the corpse and gain every food pip its corpse had.\n\
     Incoming damage from explosions is doubled.",
     {"Required Food": "+2"})
-register_feature("Fat Stores", "Other Adaptation", "When falling on a creature, you deal damage equal to 1d6 + your size. This is in addition to any fall damage you transfer to them.\nYour speed is reduced by 1.", {"Reserve Food": "+1"})
+register_feature("Fat Stores", "Other Adaptation", "When falling on a creature from at least 5 distance up, you deal damage equal to 1d6 + your size. This is in addition to any fall damage you transfer to them.\nYour speed is reduced by 1.", {"Reserve Food": "+1"})
 register_feature("Gigantism", "Other Adaptation", "Your move speed and size are both increased by 1. Your corpse is worth 2 more food pips.", {"Required Food": "+1"})
 register_feature("Minimalist", "Other Adaptation", "+1D when trying to ignore the effects of exhaustion.", {"Required Food": "-1"})
 register_feature(
