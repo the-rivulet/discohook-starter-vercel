@@ -9,7 +9,7 @@ from discohook.middleware import SingleUseSessionMiddleware
 
 APPLICATION_ID = os.getenv("DISCORD_APP_ID")
 APPLICATION_TOKEN = os.getenv("DISCORD_APP_TOKEN")
-APPLICATION_PUBLIC_KEY = os.getenv("DISCORD_APP_PUBLIC_KEY")
+APPLICATION_PUBLIC_KEY = os.getenv("DISCORD_APP_PUBLIC_KEY") 
 APPLICATION_PASSWORD = os.getenv("DISCORD_APP_PASSWORD")
 
 app = discohook.Client(
