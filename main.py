@@ -34,7 +34,7 @@ def look_for(l: dict, target: str):
         # find how many characters it shares
         for i in range(len(item)):
             x = 1
-            while i + x <= len(item) and item[i : (i + x)] in target:
+            while i + x <= len(item) and item[i : (i + x)].lower() in target:
                 shared = max(shared, x)
                 x += 1
         if shared > best_share:
@@ -54,21 +54,25 @@ register_food("Blue Fruit", "Small", "1", "Plant", "The pupae of a bug which res
 register_food(
     "Bubble Fruit", "Small", "1", "Plant", "Acts as an inedible rock until popped, by immersing it in water for one round.")
 register_food("Dandelion Peach", "Small", "1", "Plant", "Puffy plants on the end of cyan stalks, growing in regions in the clouds.")
-register_food("Glow Weed", "Small", "1", "Plant", "Provides light within 3 distance of itself, but only when underwater.", {"Trade Value": "3"})
+register_food(
+    "Glow Weed", "Small", "1", "Plant",
+    "Provides light within 3 distance of itself, but only when underwater.",
+    {"Trade Value": "3", "When Cooked": "+1 food pip. For the rest of the cycle, gain a 3 distance glow (or have it increase by 3)."})
 register_food("Gooieduck", "Small", "2", "Plant", "Requires 2 actions to eat instead of 1.\nWhile held, Worm Grass you enter is stunned.", {"Trade Value": "1"})
+register_food("Gravel Tea", "Small", "-2", "Any", "Requires 2 actions to eat instead of 1.\n+2 blessings (or +5 blessings if the consumer is starving).")
 register_food(
     "Lilypuck", "Medium", "1", "Plant",
     "Lilies which grow on the surface of underground water bodies, and held by roots which extend underwater.\
     These roots are sharp and glasslike, letting them serve as a one-use spear.",
     {"Trade Value": "4", "Impact": "On first throw, 2d4 + Power damage."})
-register_food("Slime Mold", "Small", "1-2", "Plant", "Provides light within 1 distance of itself.")
+register_food("Slime Mold", "Small", "1 ~ 2", "Plant", "Provides light within 1 distance of itself.", {"When Cooked": "Usual food pips. For the rest of the cycle, gain a 1 distance glow (or have it increase by 1)."})
 register_food(
-    "Fire Egg", "Small", "1", "Any", "Boom.",
+    "Fire Egg", "Small", "1", "Any", "The unstable eggs of a fire bug, dropped in clusters.",
     {"Impact (Volatile)": "Sticks to anything it impacts. Then, one round later, it explodes,\
      dealing 6d6 damage at the point of impact, and half of that to all creatures within 6 distance of the impact point."})
 register_food("Neuron Fly", "Small", "1", "Any", "Gain the luminescent adaptation if you don't have it.")
 register_food("Seed", "Small", "1", "Any", "The popped kernels of popcorn plants. While hard to access, they're palatable to anyone.")
-register_item("Mushroom", "Food (Any)", "Small", "Gain the haste condition for 4 rounds. The duration can stack.", {"Trade Value": "2"})
+register_item("Mushroom", "Food (Any)", "Small", "Gain the haste condition for 4 rounds. The duration can stack. While you have the haste condition, treat all mushrooms as spoiled.", {"Trade Value": "2"})
 register_item("Karma Flower", "Food (Any)" "Small", "Gain the reinforcement condition.", {"Trade Value": "5"})
 register_food("Eggbug Egg", "Small", "1", "Egg", "The eggs of the skittish eggbug, usually dropped in clusters.")
 register_food(
@@ -152,7 +156,7 @@ register_item(
     The damage to all targets is reduced by 3 for each target past the first, to a minimum of 1.",
     {"Trade Value": "5", "Strike": "Deals 2d6 + power damage."})
 # Other
-register_item("Batnip", "Other", "Small", "Batflies are drawn towards the batnip.", {"Trade Value": "2"})
+register_item("Batnip", "Other", "Small", "Batflies are drawn towards the batnip.", {"Trade Value": "2", "When Cooked": "Batflies are drawn towards you for the rest of the cycle."})
 register_item(
     "Bubble Weed", "Other", "Small",
     "|▶| You, or an adjacent or carried/carrying creature takes a breath from the bubble weed, restoring breath to maximum.\
@@ -163,11 +167,11 @@ register_item(
     "When trying to dodge an attack, if you and the attacker have equal successes, the centipede plate absorbs the damage.\
     A centipede plate will break after receiving 2d6 x 10 damage.")
 register_item("Inspector Eye", "Other", "Small", "Highly valued for trades and tolls.", {"Trade Value": "20"})
-register_item("Lantern", "Other", "Small", "Provides light within 4 distance of itself.", {"Trade Value": "3"})
+register_item("Lantern", "Other", "Small", "Provides light within 4 distance of itself. Distance reduces to 2 if in the mouth or a pouch.", {"Trade Value": "3"})
 register_item(
     "Heated Lantern", "Other", "Small",
-    "Provides light within 4 distance of itself.\n\
-    Provides +1 warmth pip each round while carried, if warmth pips are below 0.",
+    "Provides light within 4 distance of itself. Distance reduces to 2 if in the mouth or a pouch.\n\
+    Creatures in this distance who have less than 0 warmth pips, get +1 warmth pip each round. (Or +2 to anyone who carries it in their mouth)",
     {"Trade Value": "3"})
 register_item(
     "Mass Rarefaction Cell", "Other", "Large",
@@ -286,15 +290,15 @@ rules = {
     "adaptations": "Adaptations are modifications to your character, allowing for vastly different abilities and playstyles.\
     You can select them at character creation or complete Passages in order to gain new ones.\n\
     You cannot have multiple copies of the same adaptation, unless they are two different variants of it.",
-    "checks": "Checks are usually an attempt to perform a difficult task, while contests are an attempt to perform a difficult task\
-    that is being opposed by another creature, such as making an attack.\nFor checks and contests, you roll a number of D6s equal to\
-    2 + your skill. Rolling a 4, 5, or 6 means that that die is a success. For example, if you had 3 Comprehension, you would roll 5D (5 D6s).\
-    If your number of successes is 1 below the DC (or below the opposing creature's number of successes in a contest), you may opt to partially succeed instead.\
-    If you choose to do this you will succeed at the action, however it will be at a cost.\nWhen making a check, a relevant skill is chosen by the GM.\
-    They also determine the Difficulty Class (DC) of the check, typically ranging from 1 (being very easy) to 4 (being very hard).\
-    In order to pass a check, the number of successes must match or surpass the DC.\nContests are a variant of a check, however they use a contested roll instead of a DC.\
-    Both creatures involved in it make a check using the relevant skill. The creature with the higher number of successes succeeds, while the one with less fails.\
-    In the event of a tie, the initiator wins.",
+    "Skill Checks & Contests": "Checks are usually an attempt to perform a difficult task, while contests are an attempt to perform a difficult task that is being opposed by another creature, such as making an attack.\n\
+    When making a check, a relevant skill is chosen by the GM. They also determine the Difficulty Class (DC) of the check, typically ranging from 1 (being very easy) to 4 (being very hard).\n\
+    * To pass a check, the number of successes must match or surpass the DC.\n\
+    * Having one less success than the DC is a partial success. You may end up succeeding at a cost.\n\
+    * Less than that is a failure.\n\
+    For any skill check or skill contest, roll Xd6, where X is your skill value, plus two. For example, if you had 3 Comprehension, you would roll 5d6.\n\
+    Each die that rolls a 4 or more is a success.\n\
+    Contests are a variant of a check, however they use a contested roll instead of a DC. Both creatures involved in it make a check using the relevant skill.\
+    The creature with the higher number of successes succeeds, while the one with less fails. In the event of a tie, the initiator wins.",
     "carrying": "You can spend an action to mount or dismount another creature, or vice versa. How this resolves depends on the size of the two creatures:\n\
     * A creature that's two or more sizes smaller can be carried in a hand or back slot.\n\
     * A creature that's one size smaller can be carried in two hand slots, or a back slot.\n\
@@ -319,10 +323,10 @@ rules = {
     "death": "Upon death, a creature loses 1 karma, and wakes up at the start of the next cycle in their last safe resting place.\
     For player characters, they wake up in the next shelter the group enters (unless the entire group is wiped out).\n\
     If a creature dies at 1 karma, they disconnect from the cycles the rest of the group experiences, and so a new character must be created.",
-    "hiding": "You can choose to hide from creatures. When a creature may be able to spot you, using an opposed skill check (their perception VS your stealth) If you have more successes, you can remain undetected.\n\
-    Attacks made against creatures who can't find you are made with +1D to hit.\n\
+    "Hiding / Stealth": "You can choose to hide from creatures. When a creature may be able to spot you, using an opposed skill check (their perception vs your stealth) If you have more successes, you can remain undetected.\n\
+    Attacks made against creatures who can't find you are made with +2D to hit.\n\
     If they have equal or more successes, they spot you. If it's blatantly clear that you're there, you will be spotted without a roll.",
-    "karma gates": "These are colossal airlocks which separate the regions of Rain World from each other. These gates will only open once per cycle,\
+    "Karma Gates": "These are colossal airlocks which separate the regions of Rain World from each other. These gates will only open once per cycle,\
     when a creature stands within the chamber, who has at least as much Karma as the symbol on the wall represents.\
     Karma Gates may have a different symbol when approaching it from the other side.\n\
     When a Karma gate is activated, the exterior door on either side closes after a one round delay, and steam is vented through the chambers as a decontaminant on the next round.\n\
@@ -343,22 +347,22 @@ rules = {
     * If the pip reduction brings your food pips into the negatives, set them to 0 and receive the starvation condition.\n\
     Shelter Breakage: Shelters can occasionally malfunction. When they do, the shelter doors are forced open, allowing water to flood some or all of the shelter.\
     Anyone inside will need to seek out another shelter, while evading regular downpours.",
-    "foraging": "When travelling, it’s often that one will need to take time to search for resources.\n\
+    "foraging": "When travelling, it's often that one will need to take time to search for resources.\n\
     Dependent on the cycle time, your GM may allow you to take a foraging trip in order to find items which you need.\n\
     To perform a foraging trip, each person searching will need to decide for the item category they are searching for, then perform a Perception Check.\n\
     Once done, you can roll on the tables three times. Each time, roll [2d4 + Successes] to determine what you get. Each one can be from a different category.",
     "trading": "When trading items, traders will usually want to receive 2 more value than they are giving up. In some cases, they may feel reluctant to give up certain items at all.",
-    "food value": "Check off each condition on the two tables below. Skip the consumption effect table if it’s not going to be consumed. (Whether because of an incompatible diet, or the food being spoiled)\n\n\
+    "food value": "Check off each condition on the two tables below. Skip the consumption effect table if it's not going to be consumed. (Whether because of an incompatible diet, or the food being spoiled)\n\n\
     Provides food pips: +Pips\nGrants breath capacity increase: +2 if the region has a lot of water.\nGrants haste: +2\nGrants the luminescent adaptation: +4\nGrants reinforcement: +5\n\n\
     Provides protection against worm grass: +1 if the region has worm grass.\nProvides light within 1 distance of itself: +1\n\
     Provides light within 3+ distance of itself: +2\nHas an impact effect: +3\nCan hatch into a creature, and trader wants to hatch it: +Size of adult creature.",
     "tolls": "Some areas are guarded and require the group to be processed in order to proceed.\n\
     Typically, such guarded checkpoints have several creatures of one species, all armed with the best weapons they have access to. They may attack those who try to cross without paying, unless the people crossing are trusted by the guards.\n\
     Payment required typically must reach a trade value of 10 in order to allow the group to pass.",
-    "lowering the price": "A group can try to lower the price of a trader or toll once per cycle.\n\
+    "Lowering the Price": "A group can try to lower the price of a trader or toll once per cycle.\n\
     To do this, they must decide on a new price. One influence check is then performed. The DC is equal to half of the price reduction, rounded up.\n\
     * Success: The offer is accepted.\n\
-    * Partial Success: The trader / toll owner won’t accept, but will compromise in some way if there’s room to do so.\n\
+    * Partial Success: The trader / toll owner won't accept, but will compromise in some way if there's room to do so.\n\
     * Failure: The offer is rejected outright.\n\
     A particularly extreme failure can be seen as an insult to the trader or toll owner.",
     "sounds": "Most things which make noise can be heard from up to 20 distance away, plus your perception. Explosions and other loud sounds can be heard from double the range.\n\
@@ -382,7 +386,7 @@ rules = {
     * |▶| Swap the contents of two inventory or equipment slots with each other. \n\
     * |▶| With an adjacent creature, give or take an item in the hand. An opposing power check is required if they are unwilling.\
     Willing or not, the other creature does not spend an action as a part of the exchange.",
-    "taming creatures": "Creatures can be tamed by feeding them, then passing an influence check on them. Alternatively, rescuing them from a predator may greatly increase their trust in you.\n\
+    "Taming Creatures": "Creatures can be tamed by feeding them, then passing an influence check on them. Alternatively, rescuing them from a predator may greatly increase their trust in you.\n\
     Tamed creatures will defend and follow their owner, any may allow the owner to ride them if they trust the owner enough.\n\
     If the owner attacks them, or they're allowed to starve before fully bonding with the owner, their trust may be broken.\
     Herbivores who have their trust broken will generally run away, attacking if they feel trapped. Carnivores and omnivores may turn on their owner and the group.",
@@ -405,27 +409,27 @@ rules = {
     If a creature falls far enough to potentially take damage, they lose half of their remaining speed on landing, rounded up.\n\
     If a creature lands on another, half of the fall damage is transferred from the faller to the creature fallen on, rounded up.\
     One extra point of damage is transferred for every point of size the faller has.",
-    "extreme temperatures": "Warmth pips change each round, dependent on the environment:\n\
+    "Extreme Temperatures": "Warmth pips change each round, dependent on the environment:\n\
     * Normally, they shift 1 pip towards 0 each round.\n\
     * In a cold environment, the warmth pips are reduced by the tier of the cold.\n\
     * In a hot environment, the warmth pips are increased by the tier of the heat.\n\
     When a creature's warmth is past 5 + Endurance (in either direction), their speed is cut in half and they get -1D to all checks.\n\
     Whenever a creature's warmth moves beyond 8 (in either direction), they lose HP equal to the difference from 8, reduced by their Endurance.\n\
     Karma gates' steam blasts will increase warmth pips by 4 if a creature is hit by it. Any creature within a karma gate may choose to avoid the steam blast if they prefer.",
-    "the rain": "At the end of a cycle, deadly rain will begin to fall. The rain causes gradually worsening effects to those directly exposed to it.\n\
+    "The Rain": "At the end of a cycle, deadly rain will begin to fall. The rain causes gradually worsening effects to those directly exposed to it.\n\
     * After 3 rounds, -1D to perception checks.\n\
     * 3 rounds later, -2D to perception checks, and -1D to all other checks.\n\
     * 3 rounds later, the effects above apply, but the rain also deals 1d6 damage each round.\n\
     * 3 rounds later, the damage doubles to 2d6.\n\
     The world also floods significantly.\nIf sufficiently far from an iterator, deep underground, or above the clouds, some or all of the effects may not occur.",
-    "underwater & drowning": "A creature can only remain underwater for as many rounds as their breath capacity. Afterwards, they take 1 damage per round,\
+    "Underwater & Drowning": "A creature can only remain underwater for as many rounds as their breath capacity. Afterwards, they take 1 damage per round,\
     with the damage rising by 1 for each consecutive round the creature remains without air. Damage stops when the creature is able to breathe again.\
     A creature's breath is replenished only when they spend a full round above water.\n\
     Anything thrown underwater has its damage reduced by half, and its range limited to 5 distance.",
     # Combat
     "attacking": "An attack is counted as any action which has an impact or strike effect, and/or applies a negative condition to another creature.\
     For attacks whose damage is increased by a skill, a creature can only apply this increase to the damage of one attack each round.",
-    "turns & rounds": "One round consists of every creature taking their turn.\n\
+    "Turns & Rounds": "One round consists of every creature taking their turn.\n\
     All player creatures take their turn, then the rest of the creatures take their turn. The players decide which order they take their turns in,\
     and the GM decides which order the other creatures do for them.\n\
     Creatures can perform up to two actions, in addition to movement up to their speed.",
@@ -439,16 +443,18 @@ rules = {
     And, in the air, falling can be done. (Or is automatic at the end of a creature's turn, if they're not flying or holding a pole,\
     or if the creature's turn is skipped due to being unable to act). Falling uses no movement,\
     but can't be stopped until they land on something, possibly taking fall damage.",
-    "grappling": "Grapples can be fired at any target in a straight line, as long as it's within the range of the grapple.\n\
-    * If the target is a surface, the grappler is pulled to that surface.\n\
-    * If the target is an item, the item is pulled to the grappler, who may add it to their inventory.\n\
-    When a creature is targeted by a grapple, winning an agility contest against the grappler's finesse will let the targeted creature avoid the grapple.\
-    Otherwise (or if the grappled creature is willing), they're pinned to the grapple. Creatures can target a grapple, and a hit will dislodge it.\n\
-    The grappler gets these options:\
-    |▶| Reel in a grappled creature by [Power + 2] distance, if they succeed on a power contest against the grappled creature's power.\n\
-    If a creature has been grappled on this round, the first use doesn't cost an action.\n\
-    If you are in the air and not flying, you will be pulled towards them instead.\n\
-    If both creatures are in the air and not flying, the topmost creature is dragged to the bottommost one.\n\
+    "grappling": "Grapples can be fired at any target in a straight line, as long as it’s within the range of the grapple.\n\
+    If the target is a surface, the grappler is pulled to that surface.\n\
+    If the target is an item, the item is pulled to the grappler, who may add it to their inventory.\n\
+    When a creature is targeted by a grapple, winning an agility contest against the grappler’s finesse will let the targeted creature dodge the grapple.\
+    Otherwise (or if the grappled creature is willing), they’re pinned to the grapple.\
+    Creatures can target a grapple as if hitting the creature normally, and a hit will dislodge it.\n\
+    If you grapple onto a creature, you can:\n\
+    * |▶| Reel in a grappled creature by up to [Power + 2] distance, if you succeed on a power contest against the grappled creature’s power.\
+    * If a creature has been grappled on this round, the first use doesn’t cost an action.\n\
+    * If you are in the air and not flying, you will be pulled towards them instead.\n\
+    * If both creatures are in the air and not flying, the topmost creature is dragged to the bottommost one.\n\
+    * Add your size and subtract the grappled creature’s size when determining how much distance you can reel in.\n\
     An empty hand slot can also be used as a grapple on adjacent creatures.",
     "throwing": "|▶| Throw an object in a straight line. A thrown object will keep traveling until hitting something.\n\
     If a thrown object is about to hit a creature, they can try to avoid it.\
@@ -458,11 +464,16 @@ rules = {
     Every 30 spaces a thrown object travels, it receives -1 damage dice (unless volatile), and -1D to hit.\
     If damage dice is taken away while none are left, the object will harmlessly drop in place.\n\
     An item with the volatile keyword is destroyed after being thrown, whether it hits or not.",
-    "strike attacks": "|▶| Attack an adjacent target with an unarmed attack or a weapon with a strike effect.\
+    "Strike Attacks": "|▶| Attack an adjacent target with an unarmed attack or a weapon with a strike effect.\
     Make a finesse check contested with the target's agility check. If the attacker has equal or more successes, the attack hits.\
     An unarmed attack deals damage as specified by your species; a weapon applies its strike effect to the target.",
     # Conditions
     "blinded": "You are unable to see, and will automatically fail any checks that involve sight, unless you have some alternative means of sensing which will work.",
+    "camouflaged": "You may attempt to hide from others, regardless of whether you’re directly exposed to them or not. You also receive +2D to stealth while camouflaged.",
+    "dazed": "You receive -1D to agility and finesse checks. In addition, at the start of each of your turns, you must use up 5 spaces of movement, by moving in a single random direction. To determine that direction, roll d4:\
+    1 = Left, 2 = Right, 3 = Up, 4 = Down.\n\
+    Keep in mind that you’ll fall if there’s any space to do so below you, and you’ll be stopped upon reaching an impassable obstacle (but still waste the movement)",
+    "drenched": "When hit by electricity, add an extra damage die to the damage you take. In addition, you are no longer on fire and cannot be set on fire. This effect occurs whenever you enter water, and goes away 10 rounds after leaving the water.",
     "exhausted": "You lose your agility bonus to your speed, and have -1D to all skill checks.\n\
     You may choose to ignore these effects for one round, but must perform a DC 3 endurance check each time you do so:\n\
     * Success: You push through.\n\
@@ -470,8 +481,8 @@ rules = {
     * Failure: You fall unconscious for one round.",
     "frozen": "You're pinned by ice (Escape DC 2). Alternatively, any source of heat can melt the ice.",
     "haste": "The number of actions you can take on your turn is increased by 1.\nIn addition, your speed is increased by 3 and jump height increased by 1.",
-    "on fire": "You take 1d4 damage per round until you are hit by water or enter a body of water.\
-    Alternatively, you can spend an action to attempt to put out the flames with a skill check.",
+    "On Fire": "You take Xd4 damage per round, where X is the number of fires on you. Entering water or being drenched puts out all fires on you.\
+    Alternatively, you can spend an action to attempt to put out one fire with an DC 2 agility skill check. Any adjacent creatures who hit you are set on fire.",
     "pinned": "You are stuck to a surface by the object or creature pinning you, and your agility is reduced by 2 while pinned.\
     Once per turn, you may spend one action to make a power contest against the creature pinning you (for a creature) or a power check against the DC of the applying effect (for an object), breaking free on a success.\
     Every contest you fail, you gain +1D to free yourself until you succeed. Other creatures may also make this check once per turn, benefitting from the extra dice pool you've gained, but not adding to it.",
@@ -487,6 +498,8 @@ rules = {
     * You are hit by or fall in water.\n\
     * You hear a loud sound without ear protection.\n\
     * Someone adjacent to you spends an action to wake you up.",
+    "slowed": "Your speed is reduced by 3 and jump height reduced by 1, and you receive -1D on any Agility checks made. The durations can stack together.",
+    "staggered": "You lose one action on your next turn. Stacks increase the number of actions lost.",
     "stunned": "You lose your turn, instead convulsing on the ground and dropping the items held in your hands.\
     If the source was electrical, then your body will power electrical objects for the stun. After a stun ends, you are immune to being stunned for one round.",
     "terrified": "In this state, you must do one of these things:\n\
@@ -494,14 +507,24 @@ rules = {
     * Attack the nearest thing you fear. You have -1D to all checks while doing this.\n\
     * Lock up in place, taking no actions or movement.",
     "unconscious": "You cannot move or perform actions, and your breath capacity drops to 0, until you are conscious again.",
+    # Drones"
+    "drones": "Drones float beside whoever activates them. They usually come with one or two chips (decided by the GM), and can store up to ten of them. A drone will not link to a creature if they already have a drone.\n\
+    At the start of each cycle, select 1 + Comprehension of its installed chips to activate. Multiple of the same chip can be activated.\n\
+    ⌁ in these descriptions is equal to how many active chips of that type are in the drone.",
+    "chips": "All chips are considered small items when outside of a drone. The types of chips are Citizen ID, Laser, Warn, Spot, and Light.",
+    "Chip: Citizen ID": "Once per cycle, forces a karma gate, which has been restricted by the ID's iterator, to open. Also prevents the ID’s iterator from taking any action to harm you.",
+    "Chip: Laser": "|▶| Fire a laser at a chosen creature the drone can sense. Treat the laser as a thrown object, but you use perception instead of finesse to try and hit the target. On a hit, it deals 1d4 + ⌁ damage.",
+    "Chip: Warn": "⌁ times per combat, get +1D to evade an attack.",
+    "Chip: Spot": "⌁ times per cycle, you can ask the drone to find something. If it's in the same region, it will point you to it.",
+    "Chip: Light": "Provides a light grid within ⌁ x 3 distance. The light grid, while preventing total darkness, still counts as dark conditions if there’s no other source of light.",
     # Iterators
-    "superstructure hazards": "Electrical Discharge: Some sections of an iterator's superstructure are shrouded from the rain, but pass electricity through them during work.\
+    "Superstructure Hazards": "Electrical Discharge: Some sections of an iterator's superstructure are shrouded from the rain, but pass electricity through them during work.\
     Any creature in these sections when the rain arrives takes 1d6 damage per round, and any electrical equipment is charged.\n\
     Gravity: Inside most functional superstructures, there is no gravity as a side effect of mass rarefaction cells. In such conditions, these effects apply:\n\
-    * Creatures can only change the direction they travel if they’re touching a surface or pole, or throw an object.\n\
+    * Creatures can only change the direction they travel if they're touching a surface or pole, or throw an object.\n\
     * Creatures will not fall, instead continuing to travel in a straight line until they reach a surface or leave the area with zero gravity.\n\
     Areas with multiple active mass rarefaction cells will have no gravity at all times. Areas with one functional mass rarefaction cell will result in gravity alternating between zero and standard every 3 rounds.",
-    "iterator puppets": "When in a puppet room, the iterator may react differently, depending on who entered.\n\
+    "Iterator Puppets": "When in a puppet room, the iterator may react differently, depending on who entered.\n\
     Assuming the iterator is in a functional state, they may, depending on their temperament:\n\
     * Provide marks of communication, so that the creature can understand the ancients' language. (which iterators speak in)\n\
     * Try to increase maximum karma as much as they can. (Usually to 10)\n\
@@ -516,7 +539,7 @@ rules = {
     * Speed is dropped by 1 for every excess food pip, to a minimum of 1.\n\
     * Incoming damage from attacks is reduced by 1 for every two excess food pips.\n\
     * Size is increased by 1 for every three excess food pips.",
-    "shared pips": "Instead of each player having their own pip amount, all players add their pips together into an overall pool.\
+    "Shared Pips": "Instead of each player having their own pip amount, all players add their pips together into an overall pool.\
     This allows for much greater use of abilities, but means poor management can result in the whole group starving.",
     # etc
     "adaptations": "Adaptations are modifications to your character, allowing for vastly different abilities and playstyles.\
@@ -598,34 +621,37 @@ register_feature("Spontaneous Combusion", "Aggressive Adaptation", "|⊚| Receiv
 register_feature("Blood Drain", "Protective Adaptation", "Every time you hit a size 2+ creature with a melee/unarmed attack, you gain 1 HP. ", {"Required Food": "+1"})
 register_feature(
     "Chromatophores", "Protective Adaptation",
-    "|▶| Enter camouflage, granting you +2D when making stealth checks. You must spend 1 food pip for every action you make during camouflage. This may be deactivated at any time.",
+    "|▶, ⊚| You gain the camouflaged condition for one round. You can deactivate it early if you would like.\n|⊚| Maintain your invisibility, increasing its duration by one round.",
     {"Required Food": "+1"})
 register_feature("Evasive Hop", "Protective Adaptation", "You will always dodge the first incoming attack you failed to dodge in each combat encounter.")
-register_feature("Final Stand", "Protective Adaptation", "If you have at least 2 HP when you are damaged, your HP will not drop below 1.")
+register_feature("Final Stand", "Protective Adaptation", "Once per cycle, if you are dropped below 1 HP, you are set to 1 HP.\nYou can then select between performing one action or moving half of your movement. This applies immediately, regardless of whose turn it is.")
 register_feature("Hearty", "Protective Adaptation", "Gain +3 max HP. Healing in shelters is increased to 3 HP per food pip.")
 register_feature("Natural Armour", "Protective Adaptation", "Reduces incoming damage from attacks by 2, to a minimum of 1.")
 register_feature(
     "Parry", "Protective Adaptation",
     "When an attack is aimed at you, you can choose to try to parry instead of trying to dodge. To do this, you must be holding an item which is able to parry, from this list:\n\
-    * Any type of spear.\n\
-    * Any dagger.\n\
-    * Any medium or large weapon.\n\
-    Make a DC 2 finesse check. The DC increases by 1 for every 4 damage the attack has. A partial success prevents the attack from dealing damage.\
-    A full success causes the attack or thrown object to hit the attacker instead. (Unless they're able to dodge or parry it).")
+    * Any type of spear.\n* Any dagger.\n* Any medium or large weapon.\n\
+    Make a DC 2 finesse check. The DC increases by 1 for every 4 damage the attack has.\n\
+    On a success, you will not be harmed, and the attack or thrown object will hit the attacker instead. (Unless they’re able to dodge or parry it).\n\
+    Attempting to parry more than once in a round will cause you to become staggered on your next turn.")
 register_feature("Radiative", "Protective Adaptation", "Reduces the tier of heat experienced by 1.")
-register_feature("Spiny Tail", "Protective Adaptation", "Creatures who hit you in melee range or grapple you will take 2d4 damage.")
+register_feature("Spiny Tail", "Protective Adaptation", "Creatures who hit you in melee range or grapple you will take 2d4 damage, if you want them to.")
 register_feature("Thick Fur", "Protective Adaptation", "While dry, reduce the tier of cold experienced by 1, and any creature adjacent to you who has less warmth pips than you gains 1 warmth pip per round.")
 register_feature("Adrenaline Rush", "Movement Adaptation", "|▶| Enter a rush state. While in this state, you have the haste condition. However, lose 1 HP or 1 food pip a round. You may end the effect at any time.")
 register_feature("Aquatic", "Movement Adaptation", "Your breath capacity is increased by five rounds, and items thrown by you act normally underwater. Speed is also increased by 2 while in water.")
 register_feature(
+    "Charge Pounce", "Movement Adaptation",
+    "|▶| Transfer all remaining movement speed from this turn, adding it to your next turn. Your next turn also gets +4 jump height on that next turn.\n\
+    This cannot be used if you used it last turn, and getting hit before you've used your transferred movement will cause you to lose it.")
+register_feature(
     "Energy Launch", "Movement Adaptation",
     "|▶, ⊚| Travel up to 10 distance in a straight line. If you crash into something, you stop.\n\
-    |▶, ⊚⊚| Travel up to 20 distance in a straight line. If you crash into something, you stop, and it takes 2d4 + Size damage. If the target is a creature, they are able to try and dodge.\n\
+    |▶, ⊚⊚| Travel up to 20 distance in a straight line. If you crash into something, you stop and perform a strike on it. The strike does 2d4 + Size damage if it hits.\n\
     Neither of these can be done in the air.")
 register_feature("Grapple", "Movement Adaptation", "Select either a mouth, hand or back slot - they become a range 5 grapple, however it only functions when that slot is empty.", {"Reserve Food": "-2"})
 register_feature("High Metabolism", "Movement Adaptation", "You may take an extra action, but you cannot do this two turns in a row. Your speed is increased by 4, and your jump height is increased by 3.", {"Required Food": "+1", "Reserve Food": "-2"})
 register_feature("Pole Weaver", "Movement Adaptation", "While on a pole, your speed increases by your agility skill.\nYour jump height is increased by 4 while on a pole.")
-register_feature("Sticky Paws", "Movement Adaptation", "You are able to climb on walls or larger creatures.", {"Required Food": "+1"})
+register_feature("Sticky Paws", "Movement Adaptation", "You are able to climb on walls, and on creatures who are at least your size or larger.", {"Required Food": "+1"})
 register_feature(
     "Volatile Anatomy", "Movement Adaptation",
     "|▶| Create a small explosion that sends you 5 distance in a straight line.\n\
@@ -635,7 +661,8 @@ register_feature(
     {"Karmic Balance": "-1"})
 register_feature(
     "Wings", "Movement Adaptation",
-    "|⊚| You will not fall at the end of your turn for this round.\n\
+    "Your jump height is increased by 2.\n\
+    |⊚| You will not fall at the end of your turn for this round.\n\
     |⊚| Until the end of your turn, you can move freely, ignoring jump height.\n\
     Wings do not function while they are wet.",
     {"Required Food": "+1"})
@@ -649,6 +676,7 @@ register_feature(
     * Add a copy of Small Build to the child. If they get old enough, this copy can be removed.\n\
     * Finally, assign their remaining skill points as normal.\n\
     If the child is lost, all checks receive -1D unless the check is related to them.")
+register_feature("Dronemaster", "You gain a drone. It starts with three chips of your choice. Ask your GM if you plan to give it any Citizen ID Chips.")
 register_feature(
     "Lizard Friend", "Ally Adaptation",
     "You now have a tamed lizard of your choice. You may choose their age, although it might be restricted depending on your choice:\n\
@@ -660,13 +688,13 @@ register_feature(
     "Your comprehension represents neuron flies. Once per cycle, you can spend 1 comprehension to fully block an attack aimed at you, or to add a neuron fly to your inventory.\
     You cannot if it's at  -1, as you'd lose your last neuron fly.\n\
     |▶| Add a held neuron fly to your neuron cluster. Remove the item, and gain 1 comprehension. This cannot bring comprehension above 6.")
-register_feature("Operator", "Ally Adaptation", "You have an overseer which you can send commands to by spending an action. If the overseer is destroyed, it cannot be used until a new one shows up at the start of the next cycle.")
+register_feature("Operator", "Ally Adaptation", "You have an overseer which you can send commands to by speaking or gesturing to them.. If the overseer is destroyed, it cannot be used until a new one shows up at the start of the next cycle.")
 register_feature(
     "Anesthetic Barbs", "Support Adaptation",
-    "|⊚| Your next unarmed strike, if it hits, will remove an action from the target. They must also pass an endurance check or fall asleep. The DC for the check depends on their size compared to yours:\n\
-    * Smaller than you: DC 3.\n\
-    * The same size as you: DC 2.\n\
-    * Larger than you: DC 1.")
+    "|▶, ⊚| Coat a weapon. Its next attack will apply anaesthetic if it hits.\n\
+    When you land an unarmed attack, you can also spend |⊚| to apply the anaesthetic.\n\
+    Anaesthetic staggers a creature, then they must pass an endurance check to avoid falling asleep. The DC for the check depends on their size compared to yours:\n\
+    * Smaller than you: DC 3.\n* The same size as you: DC 2.\n* Larger than you: DC 1.")
 register_feature("Imitator", "Support Adaptation", "|▶| Imitate the sound of a known creature, and/or make your voice seem like it is coming from a different place than it is.")
 register_feature("Luminescent", "Support Adaptation", "You provide light within 5 distance of yourself.")
 register_feature("Signal Antennae", "Support Adaptation", "|▶| Send a telepathic message to another creature within the same region as you.")
@@ -677,8 +705,9 @@ register_feature(
     Equal successes means they will not attack you if possible (cornering them can override that). If you win, the creature gains the terrified condition.")
 register_feature(
     "Tracker", "Support Adaptation",
-    "|▶, ⊚| Mark a creature which you can sense.\
-    For 3 rounds, or until another creature is marked, you and your allies roll an extra 1D to hit the creature, and deal extra damage upon a successful hit, equal to your perception + 1.",
+    "|▶, ⊚| Mark a creature which you can sense. For 3 rounds, or until another creature is marked, you and your allies gain these benefits when attacking them:\n\
+    * Roll an extra 1D to hit the creature. This can apply multiple times per turn.\n\
+    * The first successful non-explosive hit each of you do on your turns deals extra damage, equal to your Perception + 1.\nMarks cannot stack.",
     {"Required Food": "+1"})
 register_feature("Trophallaxis", "Support Adaptation", "|⊚| Grant an adjacent creature one food pip.", {"Karmic Balance": "+1"})
 register_feature(
@@ -719,7 +748,7 @@ register_feature(
     {"Required Food": "+2"})
 register_feature("Fat Stores", "Other Adaptation", "When falling on a creature from at least 5 distance up, you deal damage equal to 1d6 + your size. This is in addition to any fall damage you transfer to them.\nYour speed is reduced by 1.", {"Reserve Food": "+1"})
 register_feature("Gigantism", "Other Adaptation", "Your move speed and size are both increased by 1. Your corpse is worth 2 more food pips.", {"Required Food": "+1"})
-register_feature("Minimalist", "Other Adaptation", "+1D when trying to ignore the effects of exhaustion.", {"Required Food": "-1"})
+register_feature("Minimalist", "Other Adaptation", "The endurance DC for successfully eating spoiled food is reduced to 2.", {"Required Food": "-1"})
 register_feature(
     "Sensitive Ears", "Other Adaptation",
     "Unless you are wearing ear protection, these effects apply:\n\
@@ -743,6 +772,12 @@ register_feature(
     * MRC: +4 pips/cycle, can be used.",
     {"Required Pips": "+2"})
 # Burdens
+register_feature(
+    "Arthropodic", "Burden",
+    "Endurance DC for successfully eating spoiled food is reduced to 2.\n\
+    You are unable to breathe and are slowed while within a spore cloud or otherwise in an environment with heavy spores.\n\
+    In addition, upon entry into either of those environments, a DC 3 endurance check must be made:\n\
+    * Success: You push through.\nPartial Success: You lose all breath, and an action.\n* Failure: You fall unconscious for one round.")
 register_feature(
     "Blinded", "Burden",
     "You always have the blinded condition.\n\
@@ -771,17 +806,18 @@ register_feature("Light Sensitivity", "Burden", "The usual penalties for dim lig
 register_feature("Master of None", "Burden", "You may increase one skill by 2 points, or two skills by 1 point.\nYou cannot raise any skill above 2 while creating your character. Passages are unaffected.")
 register_feature(
     "Overwhelming Haze", "Burden",
-    "You may increase one skill by 1 point.\nRoll 1d4 at the start of each cycle. Up to that many times, the GM may ask for a DC 3 will check.\n\
-    * Success: A slight red haze encompasses your vision, dropping your perception by 1 for one round.\n\
-    * Partial Success: Red haze creeps in, lowering perception to 0 and dropping your speed to half its usual value, rounded down. This lasts for one round.\n\
-    * Failure: The hallucination is overwhelming, and you are stunned for the round.")
+    "You may increase one skill by 1 point.\n\
+    If the total of your first two dice on any skill check is a 11 or 12, perform a DC 3 will check once your action is resolved:\n\
+    * Success: A slight red haze encompasses your vision, dropping your perception by 1 for this round.\n\
+    * Partial Success: Red haze creeps in. For this round and the next round, your perception is lowered to 0, and you have the slowed condition.\n\
+    * Failure: The hallucination is overwhelming. You are stunned for this round, and on the next round you have zero perception and have the slowed condition.")
 register_feature("Pacifist", "Burden", "You are unable to purposely harm creatures.", {"Karmic Balance": "+2"})
 # Rites
 register_rite(
     "Blast",
     "When hitting a creature with an unarmed attack, you may choose to spend blessings to add damage.\n\
     The first blessing per attack adds 1d4 + Will damage, and each extra one adds an extra 1d4.", 1)
-register_rite("Bubble", "|⦻| A chosen creature you can sense is given two additional rounds of air.", 1)
+register_rite("Bubble", "|⦻| A chosen creature you can sense has their air fully replenished.\n|⦻| A bubble weed you touch has its air supply replenshed, allowing it to be used twice again.", 1)
 register_rite(
     "Connection",
     "Once per cycle, select a creature you can sense (other than yourself) to link with. Attacking someone you are connected to breaks the connection.\n\
@@ -791,7 +827,7 @@ register_rite("Delay", "|⦻| Lock a projectile you can sense in time. You may e
 register_rite("Energy Spear", "|⦻| Materialise a spear made of hard light, to somewhere you can sense. It functions as a normal spear, but it will disappear at the end of the cycle.", 1)
 register_rite("Evade", "|⦻| A chosen creature you can sense gains +1D to their next dodge or parry. This bonus cannot stack with itself.")
 register_rite("Flash", "|▶, ⦻⦻| Create a bright flash of light somewhere you can sense. Anyone else who can see the flash must succeed a DC 2 perception check or receive the blinded condition for 2 rounds.")
-register_rite("Flight", "|⦻⦻⦻| You are flying for this round.", 3)
+register_rite("Flight", "|⦻⦻| Until the end of your turn, you can move freely, ignoring jump height. You also will not fall at the end of your turn for this round.", 3)
 register_rite(
     "Frost",
     "|▶, ⦻| Cool down an object or creature you can sense by 3 warmth pips.\n\
@@ -801,9 +837,9 @@ register_rite(
     "Gateway",
     "|▶, ⦻⦻| Open a portal between two locations you can sense, treating them as adjacent.\n\
     If you want to keep a portal open past the round you opened it, you must spend an action each turn, or it will close. It will also close after [Will + 3] rounds have passed.\n\
-    Creatures who have a gateway opened on them may want to avoid going through. In that case, a contest of their agility versus the gateway user’s will occurs.\
+    Creatures who have a gateway opened on them may want to avoid going through. In that case, a contest of their agility versus the gateway user's will occurs.\
     If the creature trying to evade wins, they move one space instead of going through.")
-register_rite("Hasten", "|⦻| You or an adjacent creature receives the haste condition until the end of the round.")
+register_rite("Hasten", "|⦻| You or an adjacent creature receives the haste condition until the end of the target's current turn. (Or next turn, if it isn't their turn)")
 register_rite(
     "Heat",
     "|▶, ⦻| Heat up an object or creature you can sense by up to 3 warmth pips.\n\
@@ -813,7 +849,10 @@ register_rite(
     "Item Recall",
     "Select an item that you have when this rite is taken or when hibernating.\n\
     |▶, ⦻⦻| The selected item is recalled into an empty slot or onto the ground in front of you.")
-register_rite("Karmic Barrier", "|▶, ⦻⦻| Materializes a karmic barrier for you or an adjacent target.\nA karmic barrier reduces the damage of the next incoming attack by Will + 1.", 2)
+register_rite(
+    "Karmic Barrier",
+    "|▶, ⦻⦻| Materializes a karmic barrier for you or an adjacent target.\nA karmic barrier reduces the damage of the next incoming attack by Will + 1.\n\
+    Karmic barriers last until a hit is taken, or the cycle ends.", 2)
 register_rite("Leech", "When hitting a creature with an unarmed attack, you may choose to spend blessings to drain food pips from it, to add to your own. Every 2 blessings used drains 1 pip.")
 register_rite(
     "Nullify",
@@ -835,14 +874,14 @@ register_rite(
     "|▶▶, ⦻⦻| Creates a portal to a shelter sized room. The portal lasts as long as is required, and lets anything through it. Only one portal can be open at a time. Any living creatures will be forced out of the room when the portal closes.\n\
     Each creature with the Void Room rite has their own unique room. Closing a void room also closes any void rooms inside of it.")
 # Songs
-register_song("Deafening Harmony", "Everyone who can hear it gets -1D to any checks involving hearing for its duration. It’s also considered very loud for anyone with sensitive ears.")
+register_song("Deafening Harmony", "Everyone who can hear it gets -1D to any checks involving hearing for its duration. It's also considered very loud for anyone with sensitive ears.")
 register_song(
     "Encouraging Melody",
     "One specific creature, chosen at the start, gets +1D on skill checks during their turn, on each round this is playing.\n\
     Outside of battle, it can be used before a check to try and aid another. It is a DC 3 influence check, with a success meaning the recipient gets +1D on their own check.")
+register_song("Polyrhythm", "If a hostile creature takes an action on its turn, on rounds this is playing, it can't take the same action again for the rest of the turn.")
 register_song("Relay Melody", "One specific creature, chosen at the start of the song, gets haste for rounds this is playing.")
 register_song("Slow Melody", "Hostile creatures are slowed for rounds this is playing.")
-register_song("Staggering Melody", "Hostile creatures are staggered for rounds this is playing.")
 register_song("Taunting Melody", "Hostile creatures will only target you for rounds this is playing.")
 
 @app.load
@@ -870,7 +909,7 @@ async def item_command(interaction: discohook.Interaction, name: str):
     options=[]
 )
 async def help_command(interaction: discohook.Interaction):
-    await interaction.response.send(content="Neuron is a Monsoon reference bot developed by Rivu (the.rivulet) and it is updated as of Monsoon **1.0.0**. It supports the following commands:\n\
+    await interaction.response.send(content="Neuron is a Monsoon reference bot developed by Rivu (the.rivulet) and it is updated as of Monsoon **1.6.0**. It supports the following commands:\n\
     `feature`: Get information about an adaptation, rite, or burden\n\
     `item`: Get information about an item\n\
     `rule`: Get information about a rule\
